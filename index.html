@@ -464,6 +464,9 @@
         <div style="position:relative">
           <div class="code-block" id="apps-script-code">const SHEET_NAME = SpreadsheetApp.getActiveSpreadsheet();
 
+<div style="position:relative">
+          <div class="code-block" id="apps-script-code">const SHEET_NAME = SpreadsheetApp.getActiveSpreadsheet();
+
 function doGet(e) {
   return handleRequest(e);
 }
@@ -478,13 +481,15 @@ function handleRequest(e) {
     const action = params.action || body.action;
     const sheet = SHEET_NAME;
 
-    // Init sheets if needed
+    // Inicializar pestañas si no existen
     ensureSheets(sheet);
 
+    // ── LEER DATOS ──────────────────────────────────────────
     if (action === 'read') {
       const tab = params.tab || body.tab;
       const s = sheet.getSheetByName(tab);
       const data = s.getDataRange().getValues();
+      if (data.length === 0) return ok({ rows: [] });
       const headers = data[0];
       const rows = data.slice(1).map(r => {
         let obj = {};
@@ -494,17 +499,22 @@ function handleRequest(e) {
       return ok({ rows });
     }
 
+    // ── ESCRIBIR DATOS ──────────────────────────────────────
     if (action === 'write') {
       const tab = body.tab;
       const rows = body.rows;
       const s = sheet.getSheetByName(tab);
+      
+      const headers = s.getRange(1, 1, 1, s.getLastColumn()).getValues()[0];
+
       rows.forEach(row => {
-        const vals = Object.values(row);
+        const vals = headers.map(h => row[h] !== undefined ? row[h] : '');
         s.appendRow(vals);
       });
       return ok({ written: rows.length });
     }
 
+    // ── ACTUALIZAR FILA ─────────────────────────────────────
     if (action === 'updateRow') {
       const tab = body.tab;
       const idField = body.idField;
@@ -514,6 +524,7 @@ function handleRequest(e) {
       const data = s.getDataRange().getValues();
       const headers = data[0];
       const idCol = headers.indexOf(idField);
+      
       for (let i = 1; i < data.length; i++) {
         if (String(data[i][idCol]) === String(idValue)) {
           Object.entries(updates).forEach(([k, v]) => {
@@ -526,6 +537,7 @@ function handleRequest(e) {
       return ok({ updated: true });
     }
 
+    // ── BORRAR FILA ─────────────────────────────────────────
     if (action === 'deleteRow') {
       const tab = body.tab;
       const idField = body.idField;
@@ -534,6 +546,7 @@ function handleRequest(e) {
       const data = s.getDataRange().getValues();
       const headers = data[0];
       const idCol = headers.indexOf(idField);
+      
       for (let i = data.length - 1; i >= 1; i--) {
         if (String(data[i][idCol]) === String(idValue)) {
           s.deleteRow(i+1);
@@ -543,19 +556,22 @@ function handleRequest(e) {
       return ok({ deleted: true });
     }
 
-    return ok({ error: 'Unknown action' });
+    return ok({ error: 'Accion desconocida' });
   } catch (err) {
     return ok({ error: err.toString() });
   }
 }
 
+// ── ESTRUCTURA DE LA BASE DE DATOS ────────────────────────
 function ensureSheets(ss) {
   const tabs = {
     'Productos': ['id','barcode','name','category','price','cost','stock','unit'],
-    'Ventas': ['id','date','total','subtotal','discount','paymentMethod','customerId','customerName','items'],
+    'Ventas': ['id','date','total','subtotal','discount','paymentMethod','amountReceived','change','customerId','customerName','sellerName','items'],
     'VentaItems': ['saleId','productId','productName','qty','price','subtotal'],
-    'Clientes': ['id','name','phone','email','notes','totalPurchases','totalAmount','createdAt']
+    'Clientes': ['id','name','phone','email','notes','totalPurchases','totalAmount','createdAt'],
+    'Usuarios': ['id', 'name', 'pin', 'role', 'active']
   };
+  
   Object.entries(tabs).forEach(([name, headers]) => {
     let s = ss.getSheetByName(name);
     if (!s) {
