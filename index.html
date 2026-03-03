@@ -42,6 +42,31 @@
     /* Transición suave para cambios globales si es necesario */
     transition: background-color 0.3s ease; 
   }
+    <div id="lock-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:2000; flex-direction:column; align-items:center; justify-content:center;">
+  <div style="text-align:center; margin-bottom: 30px; animation: slideInUp 0.4s ease-out;">
+    <div class="logo-text" style="font-size:42px">Venta<span>Flow</span></div>
+    <div style="color:var(--text-muted); margin-top:12px; font-size: 15px;">Ingresa tu PIN para continuar</div>
+  </div>
+  
+  <div style="display:flex; gap:16px; margin-bottom:40px; animation: fadeIn 0.6s ease-out;" id="pin-display">
+    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+  </div>
+  
+  <div class="numpad" style="animation: slideInUp 0.5s ease-out;">
+    <button class="num-btn" onclick="addPin('1')">1</button>
+    <button class="num-btn" onclick="addPin('2')">2</button>
+    <button class="num-btn" onclick="addPin('3')">3</button>
+    <button class="num-btn" onclick="addPin('4')">4</button>
+    <button class="num-btn" onclick="addPin('5')">5</button>
+    <button class="num-btn" onclick="addPin('6')">6</button>
+    <button class="num-btn" onclick="addPin('7')">7</button>
+    <button class="num-btn" onclick="addPin('8')">8</button>
+    <button class="num-btn" onclick="addPin('9')">9</button>
+    <button class="num-btn" style="color:var(--red); font-size: 20px;" onclick="clearPin()">C</button>
+    <button class="num-btn" onclick="addPin('0')">0</button>
+    <button class="num-btn" style="color:var(--accent); font-size: 24px;" onclick="removePin()">⌫</button>
+  </div>
+</div>
 
   code, .mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -366,6 +391,24 @@
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .form-grid { grid-template-columns: 1fr; }
   }
+    /* ── NUMPAD & LOGIN ──────────────────────────────── */
+  .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); transition: all 0.2s; background: transparent; }
+  .pin-dot.filled { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px var(--accent-dim); transform: scale(1.1); }
+  
+  .numpad { display: grid; grid-template-columns: repeat(3, 80px); gap: 20px; justify-content: center; }
+  .num-btn { 
+    width: 80px; height: 80px; border-radius: 50%; 
+    background: var(--surface2); border: 1px solid var(--border); 
+    color: var(--text); font-size: 28px; font-weight: 600; 
+    cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow-sm);
+  }
+  .num-btn:hover { background: var(--surface3); border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md);}
+  .num-btn:active { transform: scale(0.92); background: var(--surface); box-shadow: none;}
+
+  /* Clase de utilidad para esconder elementos a los cajeros */
+  .hide-for-cajero { display: none !important; }
 </style>
 </head>
 <body>
