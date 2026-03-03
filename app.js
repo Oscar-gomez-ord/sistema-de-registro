@@ -1,15 +1,13 @@
-// ═══════════════════════════════════════════════════════════════
-// STATE & CONFIGURACIÓN BASE
-// ═══════════════════════════════════════════════════════════════
 let state = {
   config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN', minStock: 5 },
+  currentUser: { name: 'Admin', role: 'admin' },
   products: [],
   customers: [],
   sales: [],
   cart: [],
   editingProductId: null,
   editingCustomerId: null,
-  scannerTarget: 'pos', // 'pos' | 'product'
+  scannerTarget: 'pos', 
   scannerStream: null,
   scannerInterval: null,
   currentCat: '',
@@ -30,9 +28,9 @@ const formatMoney = (amount) => {
   }).format(amount);
 };
 
-// ═══════════════════════════════════════════════════════════════
+
 // INICIALIZACIÓN
-// ═══════════════════════════════════════════════════════════════
+
 window.addEventListener('load', () => {
   loadLocal();
   
@@ -96,9 +94,7 @@ function showApp() {
   switchPage('pos');
 }
 
-// ═══════════════════════════════════════════════════════════════
 // SETUP Y ONBOARDING
-// ═══════════════════════════════════════════════════════════════
 function showSetupStep(n) {
   [1, 2, 3].forEach(i => {
     document.getElementById(`setup-step-${i}`).style.display = i === n ? '' : 'none';
@@ -149,9 +145,7 @@ function saveConfig() {
   toast('¡Configuración guardada! Sincronizando datos...', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
 // API Y SINCRONIZACIÓN (GOOGLE SHEETS)
-// ═══════════════════════════════════════════════════════════════
 async function apiCall(params) {
   const { scriptUrl } = state.config;
   if (!scriptUrl) return null;
@@ -215,9 +209,7 @@ function setSyncStatus(ok, text) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
 // NAVEGACIÓN
-// ═══════════════════════════════════════════════════════════════
 const PAGE_TITLES = {
   pos: 'Punto de Venta',
   inventory: 'Inventario',
@@ -240,9 +232,7 @@ function switchPage(page) {
   if (page === 'sales-hist') renderHistory();
 }
 
-// ═══════════════════════════════════════════════════════════════
 // PUNTO DE VENTA (POS) - PRODUCTOS
-// ═══════════════════════════════════════════════════════════════
 function renderPOSProducts() {
   const cats = [...new Set(state.products.map(p => p.category).filter(Boolean))];
   const catsDiv = document.getElementById('pos-cats');
@@ -293,9 +283,7 @@ function addByBarcode(code) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
 // CARRITO DE COMPRAS
-// ═══════════════════════════════════════════════════════════════
 function addToCart(productId) {
   const prod = state.products.find(p => String(p.id) === String(productId));
   if (!prod) return;
@@ -366,9 +354,7 @@ function updateCartUI() {
   document.getElementById('cart-total').textContent = formatMoney(total);
 }
 
-// ═══════════════════════════════════════════════════════════════
 // CHECKOUT Y PAGOS
-// ═══════════════════════════════════════════════════════════════
 function handleCashCheckout() {
   if (!state.cart.length) { toast('El carrito está vacío', 'error'); return; }
   
@@ -435,6 +421,7 @@ async function checkout(method, amountReceived = 0) {
     change: method === 'Efectivo' ? (amountReceived - total).toFixed(2) : 0,
     customerId: custId || '',
     customerName: custName,
+    sellerName: state.currentUser.name, // <--- AÑADIR ESTO
     items: state.cart.length,
   };
 
@@ -490,9 +477,7 @@ async function checkout(method, amountReceived = 0) {
   toast('Venta registrada exitosamente', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
 // TICKETS E IMPRESIÓN
-// ═══════════════════════════════════════════════════════════════
 function showReceipt(sale, cartItems) {
   const body = document.getElementById('receipt-body');
   body.innerHTML = `
@@ -568,9 +553,7 @@ function printReceipt() {
   w.document.close();
 }
 
-// ═══════════════════════════════════════════════════════════════
 // INVENTARIO
-// ═══════════════════════════════════════════════════════════════
 function renderInventory() {
   const q = (document.getElementById('inv-search')?.value||'').toLowerCase();
   const cat = document.getElementById('inv-cat-filter')?.value||'';
@@ -708,9 +691,7 @@ function adjustStock(id) {
   toast(`Stock ajustado: ${prod.stock} ${prod.unit}`, 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
 // CRM (CLIENTES)
-// ═══════════════════════════════════════════════════════════════
 function renderCRM() {
   const q = (document.getElementById('crm-search')?.value||'').toLowerCase();
   let custs = state.customers;
@@ -813,9 +794,7 @@ async function deleteCustomer(id) {
   toast('Cliente eliminado', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
 // REPORTES Y ANÁLISIS
-// ═══════════════════════════════════════════════════════════════
 function renderReports() {
   const todayDate = new Date().toISOString().split('T')[0];
   const thisMonth = todayDate.substring(0,7);
@@ -901,9 +880,7 @@ function renderReports() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
 // HISTORIAL DE VENTAS
-// ═══════════════════════════════════════════════════════════════
 function setDefaultDates() {
   const today = new Date().toISOString().split('T')[0];
   const from = new Date(); 
@@ -950,9 +927,7 @@ function renderHistory() {
   `).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
 // ESCÁNER DE CÓDIGO DE BARRAS (WEBCAM/MOBILE)
-// ═══════════════════════════════════════════════════════════════
 function openBarcodeScanner() {
   state.scannerTarget = 'pos';
   startScanner();
@@ -1014,9 +989,7 @@ function closeScanner() {
   document.getElementById('scanner-modal').style.display = 'none';
 }
 
-// ═══════════════════════════════════════════════════════════════
 // EXPORTACIÓN A CSV
-// ═══════════════════════════════════════════════════════════════
 function exportToCSV(filename, headers, rows) {
   const escapeCSV = (val) => `"${String(val).replace(/"/g, '""')}"`;
   
@@ -1048,9 +1021,7 @@ function exportData(type) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
 // SETTINGS Y UTILIDADES
-// ═══════════════════════════════════════════════════════════════
 function openSettings() {
   document.getElementById('settings-biz').value = state.config.bizName;
   document.getElementById('settings-url').value = state.config.scriptUrl;
