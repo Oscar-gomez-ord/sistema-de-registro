@@ -139,18 +139,30 @@ async function testConnection() {
   document.getElementById('test-btn').disabled = false;
 }
 
-function saveConfig() {
+async function saveConfig() {
   const url = document.getElementById('script-url-input').value.trim();
   const biz = document.getElementById('biz-name-input').value.trim() || 'Mi Tienda';
-  
   if (!url) { toast('Ingresa la URL del script', 'error'); return; }
   
+  const btn = document.getElementById('save-config-btn');
+  btn.disabled = true; btn.textContent = 'Conectando...';
+
   state.config.scriptUrl = url;
   state.config.bizName = biz;
   saveLocal();
-  showApp();
-  syncAll();
-  toast('¡Configuración guardada! Sincronizando datos...', 'success');
+  
+  await syncAll(); // Esperamos a que baje la BD
+
+  btn.disabled = false; btn.textContent = '✓ Guardar y comenzar';
+  document.getElementById('setup-page').style.display = 'none';
+
+  // Si la BD de usuarios está vacía, forzamos crear el admin
+  if (state.users.length === 0) {
+    state.isFirstSetup = true;
+    openUserModal(null, true);
+  } else {
+    showApp();
+  }
 }
 
 // API Y SINCRONIZACIÓN (GOOGLE SHEETS)
@@ -1163,4 +1175,130 @@ function applyRoles(role) {
   
   // Esconder botones de configuración general
   document.querySelector('.sidebar-footer').classList.toggle('hide-for-cajero', isCajero);
+}
+// ═══════════════════════════════════════════════════════════════
+// GESTIÓN DE PERSONAL (USUARIOS)
+// ═══════════════════════════════════════════════════════════════
+function renderUsers() {
+  const tbody = document.getElementById('users-tbody');
+  if (!tbody) return;
+  
+  if (!state.users.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No hay usuarios registrados.</p></div></td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = state.users.map(u => `
+    <tr>
+      <td style="font-weight:600">${u.name} ${u.id === state.currentUser?.id ? '(Tú)' : ''}</td>
+      <td class="mono">••••</td> <td><span class="badge ${u.role === 'admin' ? 'badge-blue' : 'badge-amber'}">${u.role.toUpperCase()}</span></td>
+      <td><span class="badge ${String(u.active) !== 'false' ? 'badge-green' : 'badge-red'}">${String(u.active) !== 'false' ? 'Activo' : 'Inactivo'}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">✏️</button>
+        ${u.id !== state.currentUser?.id ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">🗑</button>` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openUserModal(id = null, isFirst = false) {
+  state.editingUserId = id;
+  const title = document.getElementById('user-modal-title');
+  const firstMsg = document.getElementById('first-setup-msg');
+  const closeBtn = document.getElementById('close-user-modal-btn');
+  const cancelBtn = document.getElementById('cancel-user-modal-btn');
+  const roleGroup = document.getElementById('user-role-group');
+
+  if (isFirst) {
+    title.textContent = 'Configuración Inicial';
+    firstMsg.style.display = 'block';
+    closeBtn.style.display = 'none'; // No puede cerrar hasta que cree el admin
+    cancelBtn.style.display = 'none';
+    roleGroup.style.display = 'none'; // El primero siempre es admin
+    document.getElementById('user-role').value = 'admin';
+    document.getElementById('user-name').value = '';
+    document.getElementById('user-pin').value = '';
+  } else if (id) {
+    const u = state.users.find(u => u.id === id);
+    title.textContent = 'Editar Usuario';
+    firstMsg.style.display = 'none';
+    closeBtn.style.display = ''; cancelBtn.style.display = ''; roleGroup.style.display = '';
+    document.getElementById('user-name').value = u.name;
+    document.getElementById('user-pin').value = u.pin;
+    document.getElementById('user-role').value = u.role;
+  } else {
+    title.textContent = 'Nuevo Usuario';
+    firstMsg.style.display = 'none';
+    closeBtn.style.display = ''; cancelBtn.style.display = ''; roleGroup.style.display = '';
+    document.getElementById('user-name').value = '';
+    document.getElementById('user-pin').value = '';
+    document.getElementById('user-role').value = 'cajero';
+  }
+  
+  document.getElementById('user-modal').style.display = '';
+}
+
+async function saveUser() {
+  const name = document.getElementById('user-name').value.trim();
+  const pin = document.getElementById('user-pin').value.trim();
+  const role = document.getElementById('user-role').value;
+  
+  if (!name || pin.length !== 4) { 
+    toast('Ingresa un nombre y un PIN de 4 dígitos', 'error'); 
+    return; 
+  }
+
+  // Prevenir PINs duplicados
+  const pinExists = state.users.some(u => u.pin === pin && u.id !== state.editingUserId);
+  if (pinExists) {
+    toast('Este PIN ya está en uso por otro usuario', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('save-user-btn');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  const user = {
+    id: state.editingUserId || ('U' + Date.now()),
+    name, pin, role, active: 'true'
+  };
+
+  if (state.editingUserId) {
+    const idx = state.users.findIndex(u => u.id === state.editingUserId);
+    state.users[idx] = user;
+    await apiCall({ action: 'updateRow', tab: 'Usuarios', idField: 'id', idValue: user.id, updates: user });
+    toast('Usuario actualizado', 'success');
+  } else {
+    state.users.push(user);
+    await apiCall({ action: 'write', tab: 'Usuarios', rows: [user] });
+    toast('Usuario creado', 'success');
+  }
+
+  saveLocal();
+  closeModal('user-modal');
+  renderUsers();
+  btn.disabled = false; btn.textContent = 'Guardar Usuario';
+
+  // Si era la configuración inicial, mándalo a loguearse
+  if (state.isFirstSetup) {
+    state.isFirstSetup = false;
+    showApp(); // Esto lo mandará al lock-screen
+    toast('¡Todo listo! Inicia sesión con tu nuevo PIN', 'success');
+  }
+}
+
+async function deleteUser(id) {
+  if (!confirm('¿Eliminar este usuario? Ya no podrá ingresar al sistema.')) return;
+  state.users = state.users.filter(u => u.id !== id);
+  saveLocal();
+  renderUsers();
+  await apiCall({ action: 'deleteRow', tab: 'Usuarios', idField: 'id', idValue: id });
+  toast('Usuario eliminado', 'success');
+}
+
+// Llama a renderUsers dentro de switchPage cuando entras a la vista
+const originalSwitchPage = switchPage;
+switchPage = function(page) {
+  originalSwitchPage(page);
+  if (page === 'users') renderUsers();
 }
