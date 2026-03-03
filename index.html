@@ -609,6 +609,10 @@ function ok(data) {
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         <span>Clientes CRM</span>
       </button>
+      <button class="nav-btn" onclick="switchPage('users')" id="nav-users">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <span>Personal</span>
+      </button>
       <div class="nav-section">Análisis</div>
       <button class="nav-btn" onclick="switchPage('reports')" id="nav-reports">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -748,7 +752,19 @@ function ok(data) {
     </div>
   </div>
 </div>
-
+<div id="page-users" class="content" style="display:none">
+      <div class="inv-controls">
+        <button class="btn btn-accent" onclick="openUserModal()">+ Nuevo Usuario</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>PIN</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 <div class="modal-overlay" id="cash-modal" style="display:none" onclick="if(event.target===this)closeModal('cash-modal')">
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
@@ -930,7 +946,38 @@ function ok(data) {
     </div>
   </div>
 </div>
-
+<div class="modal-overlay" id="user-modal" style="display:none" onclick="if(event.target===this && !state.isFirstSetup)closeModal('user-modal')">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title" id="user-modal-title">Nuevo Usuario</div>
+      <button class="btn btn-ghost btn-icon btn-sm" id="close-user-modal-btn" onclick="closeModal('user-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="first-setup-msg" style="display:none; background:var(--accent-dim); color:var(--accent); padding:12px; border-radius:var(--radius-sm); font-size:13px; margin-bottom:8px;">
+        ¡Bienvenido! Crea tu cuenta de Administrador para empezar.
+      </div>
+      <div class="input-group">
+        <label class="input-label">Nombre *</label>
+        <input type="text" id="user-name" class="input" placeholder="Ej: Carlos Admin">
+      </div>
+      <div class="input-group">
+        <label class="input-label">PIN (4 dígitos) *</label>
+        <input type="number" id="user-pin" class="input" placeholder="1234" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);">
+      </div>
+      <div class="input-group" id="user-role-group">
+        <label class="input-label">Rol</label>
+        <select id="user-role" class="input">
+          <option value="admin">Administrador (Acceso total)</option>
+          <option value="cajero">Cajero (Solo Punto de Venta)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancel-user-modal-btn" onclick="closeModal('user-modal')">Cancelar</button>
+      <button class="btn btn-accent" id="save-user-btn" onclick="saveUser()">Guardar Usuario</button>
+    </div>
+  </div>
+</div>
 <script src="js/app.js"></script>
 </body>
 </html>
