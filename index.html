@@ -455,16 +455,13 @@
         <button class="btn btn-accent" onclick="showSetupStep(2)">Siguiente →</button>
       </div>
 
-      <div id="setup-step-2" style="padding:0 24px 24px;display:none">
+<div id="setup-step-2" style="padding:0 24px 24px;display:none">
         <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">2. Crea el Apps Script</h3>
         <p style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:16px">
           En tu Google Sheet, ve a <strong style="color:var(--text)">Extensiones → Apps Script</strong>. 
           Borra el código existente y pega el siguiente:
         </p>
         <div style="position:relative">
-          <div class="code-block" id="apps-script-code">const SHEET_NAME = SpreadsheetApp.getActiveSpreadsheet();
-
-<div style="position:relative">
           <div class="code-block" id="apps-script-code">const SHEET_NAME = SpreadsheetApp.getActiveSpreadsheet();
 
 function doGet(e) {
@@ -594,7 +591,6 @@ function ok(data) {
         </p>
         <button class="btn btn-accent" style="margin-top:16px" onclick="showSetupStep(3)">Siguiente →</button>
       </div>
-
       <div id="setup-step-3" style="padding:0 24px 24px;display:none">
         <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">3. Conecta tu base de datos</h3>
         <div class="input-group" style="margin-bottom:16px">
