@@ -1,6 +1,7 @@
 let state = {
   config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN', minStock: 5 },
   currentUser: null,
+  isFirstSetup: false,
   users: [],
   products: [],
   customers: [],
@@ -227,6 +228,7 @@ const PAGE_TITLES = {
   crm: 'Clientes CRM',
   reports: 'Reportes',
   'sales-hist': 'Historial de Ventas',
+  users: 'Gestión de Personal',
 };
 
 function switchPage(page) {
@@ -1156,6 +1158,7 @@ function applyRoles(role) {
   // Esconder botones del menú lateral según el rol
   document.getElementById('nav-inventory').classList.toggle('hide-for-cajero', isCajero);
   document.getElementById('nav-crm').classList.toggle('hide-for-cajero', isCajero);
+  document.getElementById('nav-users').classList.toggle('hide-for-cajero', isCajero);
   document.getElementById('nav-reports').classList.toggle('hide-for-cajero', isCajero);
   
   // Esconder botones de configuración general
