@@ -724,6 +724,20 @@ function ok(data) {
       </div>
       <div id="crm-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
     </div>
+    
+    <div id="page-users" class="content" style="display:none">
+      <div class="inv-controls">
+        <button class="btn btn-accent" onclick="openUserModal()">+ Nuevo Usuario</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>PIN</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <div id="page-reports" class="content" style="display:none">
       <div class="stats-grid" id="report-stats"></div>
@@ -752,19 +766,7 @@ function ok(data) {
     </div>
   </div>
 </div>
-<div id="page-users" class="content" style="display:none">
-      <div class="inv-controls">
-        <button class="btn btn-accent" onclick="openUserModal()">+ Nuevo Usuario</button>
-      </div>
-      <div class="card" style="padding:0;overflow:hidden">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Nombre</th><th>PIN</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
-            <tbody id="users-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+
 <div class="modal-overlay" id="cash-modal" style="display:none" onclick="if(event.target===this)closeModal('cash-modal')">
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
@@ -946,6 +948,7 @@ function ok(data) {
     </div>
   </div>
 </div>
+
 <div class="modal-overlay" id="user-modal" style="display:none" onclick="if(event.target===this && !state.isFirstSetup)closeModal('user-modal')">
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
@@ -978,6 +981,7 @@ function ok(data) {
     </div>
   </div>
 </div>
+
 <script src="js/app.js"></script>
 </body>
 </html>
