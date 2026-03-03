@@ -1,6 +1,7 @@
 let state = {
   config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN', minStock: 5 },
-  currentUser: { name: 'Admin', role: 'admin' },
+  currentUser: null,
+  users: [],
   products: [],
   customers: [],
   sales: [],
@@ -89,9 +90,15 @@ function showSetup() {
 
 function showApp() {
   document.getElementById('setup-page').style.display = 'none';
-  document.getElementById('main-app').style.display = '';
-  document.getElementById('biz-name-display').textContent = state.config.bizName;
-  switchPage('pos');
+  // Si no hay usuario logueado, muestra el Lock Screen
+  if (!state.currentUser) {
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+  } else {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = '';
+    switchPage('pos');
+  }
 }
 
 // SETUP Y ONBOARDING
@@ -169,6 +176,7 @@ async function syncAll() {
   const [prodData, custData, salesData] = await Promise.all([
     apiCall({ action: 'read', tab: 'Productos' }),
     apiCall({ action: 'read', tab: 'Clientes' }),
+    apiCall({ action: 'read', tab: 'Usuarios' }),
     apiCall({ action: 'read', tab: 'Ventas' }),
   ]);
 
@@ -176,6 +184,9 @@ async function syncAll() {
     state.products = prodData.rows.filter(r => r.id);
     renderInventory();
     renderPOSProducts();
+  }
+  if (usersData?.ok) {
+    state.users = usersData.rows.filter(r => r.id);
   }
   if (custData?.ok) {
     state.customers = custData.rows.filter(r => r.id);
@@ -1068,4 +1079,85 @@ function toggleKeypad() {
   if(!input) return;
   input.type = input.type === 'text' ? 'number' : 'text';
   input.focus();
+}
+// ═══════════════════════════════════════════════════════════════
+// LOGIN Y ROLES
+// ═══════════════════════════════════════════════════════════════
+let currentPin = '';
+
+function addPin(num) {
+  if (currentPin.length < 4) currentPin += num;
+  updatePinDisplay();
+  if (currentPin.length === 4) setTimeout(attemptLogin, 200);
+}
+
+function clearPin() { 
+  currentPin = ''; 
+  updatePinDisplay(); 
+}
+
+function removePin() { 
+  currentPin = currentPin.slice(0, -1); 
+  updatePinDisplay(); 
+}
+
+function updatePinDisplay() {
+  const dots = document.querySelectorAll('.pin-dot');
+  dots.forEach((dot, i) => {
+    if (i < currentPin.length) dot.classList.add('filled');
+    else dot.classList.remove('filled');
+  });
+}
+
+function attemptLogin() {
+  // Backdoor de seguridad inicial por si la BD de usuarios está vacía
+  if (state.users.length === 0 && currentPin === '1234') {
+    handleLoginSuccess({ id: '0', name: 'Admin Maestro', role: 'admin' });
+    return;
+  }
+
+  const user = state.users.find(u => String(u.pin) === currentPin && String(u.active) !== 'false');
+  
+  if (user) {
+    handleLoginSuccess(user);
+  } else {
+    toast('PIN Incorrecto', 'error');
+    clearPin();
+  }
+}
+
+function handleLoginSuccess(user) {
+  state.currentUser = user;
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = '';
+  
+  // Actualizar perfil lateral
+  const profileDisplay = document.getElementById('biz-name-display');
+  profileDisplay.innerHTML = `${state.config.bizName} <br>
+    <span style="color:var(--accent); cursor:pointer; display:inline-block; margin-top:4px;" onclick="logout()">
+      👤 ${user.name} (${user.role}) [Salir]
+    </span>`;
+    
+  applyRoles(user.role);
+  switchPage('pos');
+  toast(`Bienvenido, ${user.name}`, 'success');
+  clearPin();
+}
+
+function logout() {
+  state.currentUser = null;
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('lock-screen').style.display = 'flex';
+  clearPin();
+}
+
+function applyRoles(role) {
+  const isCajero = role === 'cajero';
+  // Esconder botones del menú lateral según el rol
+  document.getElementById('nav-inventory').classList.toggle('hide-for-cajero', isCajero);
+  document.getElementById('nav-crm').classList.toggle('hide-for-cajero', isCajero);
+  document.getElementById('nav-reports').classList.toggle('hide-for-cajero', isCajero);
+  
+  // Esconder botones de configuración general
+  document.querySelector('.sidebar-footer').classList.toggle('hide-for-cajero', isCajero);
 }
