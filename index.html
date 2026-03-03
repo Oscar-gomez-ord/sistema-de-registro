@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VentaFlow - Sistema POS</title>
+<title>VentaFlow - Enterprise POS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
   :root {
-    /* Paleta Pizarra (Slate) */
+    /* Paleta Pizarra (Slate) - Profesional y Equilibrada */
     --bg: #0f172a;           
     --surface: #1e293b;      
     --surface2: #334155;     
     --surface3: #475569;     
     --border: #334155;       
-    --accent: #3b82f6;       
+    --accent: #3b82f6;       /* Azul vibrante */
     --accent-hover: #2563eb;
     --accent-dim: rgba(59, 130, 246, 0.15);
     
@@ -48,21 +48,28 @@
   .code-block { background: #0b0f19; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a8b5ff; overflow-y: auto; height: 250px; white-space: pre; margin-bottom: 16px;}
   
   .wizard-header { text-align: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 24px;}
-  .wizard-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 8px;}
-  .wizard-step-indicator { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+  .wizard-title { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px;}
+  .wizard-step-indicator { font-size: 13px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;}
 
   /* ── SELECCIÓN DE USUARIO ── */
   .user-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; width: 100%; max-width: 800px; margin-top: 40px; }
   .user-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 24px 16px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); position: relative; }
   .user-card:hover { border-color: var(--accent); background: var(--surface2); transform: translateY(-5px); }
+  
   .user-card.admin { border-color: rgba(251, 191, 36, 0.4); background: linear-gradient(180deg, var(--surface), rgba(251, 191, 36, 0.05)); }
   .user-card.admin:hover { border-color: var(--gold); }
+  .user-card.gerente { border-color: rgba(59, 130, 246, 0.4); }
+  .user-card.gerente:hover { border-color: var(--accent); }
+  
   .admin-crown { position: absolute; top: -12px; font-size: 24px; }
-  .user-card-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+  .user-card-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--surface3); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 16px; }
   .user-card.admin .user-card-avatar { background: linear-gradient(135deg, var(--warning), #d97706); color: #000;}
+  .user-card.gerente .user-card-avatar { background: linear-gradient(135deg, var(--accent), var(--blue)); }
+  
   .user-card-name { font-size: 16px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.2; margin-bottom: 4px; }
   .user-card-role { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
   .user-card.admin .user-card-role { color: var(--gold); }
+  .user-card.gerente .user-card-role { color: var(--accent); }
 
   /* ── PIN PAD ── */
   #pin-display { display: flex; gap: 16px; margin: 20px 0 40px; justify-content: center; }
@@ -73,7 +80,7 @@
   .num-btn:hover { background: var(--surface3); border-color: var(--accent); transform: translateY(-2px); }
   .num-btn:active { transform: scale(0.95); }
 
-  /* ── COMPONENTES UI ── */
+  /* ── COMPONENTES UI GLOBALES ── */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-sm); border: none; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
   .btn:active { transform: scale(0.97); }
   .btn-accent { background: var(--accent); color: #fff; }
@@ -102,15 +109,16 @@
   .badge { display: inline-flex; padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600; }
   .badge-green { background: var(--green-dim); color: var(--green); }
   .badge-red { background: var(--red-dim); color: var(--red); }
-  .badge-amber { background: rgba(245,158,11,0.15); color: var(--warning); }
   .badge-blue { background: var(--blue-dim); color: var(--blue); }
+  .badge-amber { background: rgba(245,158,11,0.15); color: var(--warning); }
 
-  /* ── LAYOUT PRINCIPAL ── */
+  /* ── LAYOUT PRINCIPAL APP ── */
   .app { display: flex; height: 100vh; width: 100vw; }
   .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
   .sidebar-logo { padding: 24px; border-bottom: 1px solid var(--border); }
   .logo-text { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
   .logo-text span { color: var(--accent); }
+  .logo-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;}
 
   .nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
   .nav-btn { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; text-align: left; }
@@ -161,16 +169,14 @@
   .cart-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); align-items: center; }
   .cart-row.total { font-size: 26px; font-weight: 800; color: var(--text); font-family: 'JetBrains Mono', monospace; }
 
-  /* ── MODALS ── */
+  /* ── MODALS Y UTILIDADES ── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; animation: fadeIn 0.2s; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 500px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 500px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); animation: popIn 0.3s; }
   .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); border-radius: var(--radius) var(--radius) 0 0; }
-  .modal-title { font-size: 18px; font-weight: 700; }
   .modal-body { padding: 24px; overflow-y: auto; max-height: 70vh; }
   .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; background: var(--surface2); border-radius: 0 0 var(--radius) var(--radius); }
 
-  /* UTILS */
-  .hide-for-cajero { display: none !important; }
+  .hide-role { display: none !important; }
   .top-controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
   #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 10001; }
   .toast { background: var(--surface); border: 1px solid var(--border); padding: 14px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; animation: slideUp 0.3s; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--accent); }
@@ -188,15 +194,12 @@
     <div style="color:var(--text-muted); font-size:16px;">Sistema Inteligente de Punto de Venta</div>
   </div>
 
-  <div id="setup-choice" class="auth-card">
-    <h2 style="text-align:center; margin-bottom: 10px;">Paso 1: Conecta la Base de Datos</h2>
-    <p style="text-align:center; color:var(--text-muted);">Sigue estos pasos rápidos:</p>
+  <div id="setup-card-main" class="auth-card" style="max-width: 800px;">
+    <h2 style="margin-bottom:10px;">Conecta tu Base de Datos</h2>
+    <p style="color:var(--text-muted); margin-bottom:20px;">Sigue estos 3 pasos para enlazar Google Sheets de forma segura.</p>
     
-    <div style="background:var(--bg); border:1px solid var(--border); padding:16px; border-radius:var(--radius-sm); margin-top:20px;">
-      <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">
-        1. Crea un Google Sheet.<br>
-        2. Ve a <b>Extensiones > Apps Script</b>, borra el contenido y pega esto:<br>
-      </p>
+    <div style="background:var(--bg); border:1px solid var(--border); padding:16px; border-radius:var(--radius-sm); margin-bottom:20px;">
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">1. Crea un Google Sheet nuevo.<br>2. Ve a <b>Extensiones > Apps Script</b>, borra todo y pega este código:</p>
 <div class="code-block" id="apps-script-code">const SHEET_NAME = SpreadsheetApp.getActiveSpreadsheet();
 function doGet(e) { return handleRequest(e); }
 function doPost(e) { return handleRequest(e); }
@@ -249,94 +252,42 @@ function ensureSheets(ss) {
     'Ventas': ['id','date','total','subtotal','discount','paymentMethod','amountReceived','change','customerId','customerName','sellerName','items'],
     'VentaItems': ['saleId','productId','productName','qty','price','subtotal'],
     'Clientes': ['id','name','phone','email','notes','totalPurchases','totalAmount','createdAt'],
-    'Usuarios': ['id', 'name', 'pin', 'role', 'active']
+    'Usuarios': ['id', 'name', 'pin', 'role', 'active', 'goal'],
+    'Proveedores': ['id', 'name', 'company', 'phone', 'email', 'notes']
   };
   Object.entries(tabs).forEach(([name, headers]) => { let s = ss.getSheetByName(name); if (!s) { s = ss.insertSheet(name); s.appendRow(headers); } });
 }
 function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: true, ...data })).setMimeType(ContentService.MimeType.JSON); }
 </div>
-      <button class="btn btn-ghost btn-sm" style="width:100%" onclick="copyScript()">Copiar Código</button>
-      <p style="font-size:14px; color:var(--text-muted); margin-top:12px;">
-        3. Haz <b>Nueva Implementación (App Web, acceso Cualquier Usuario)</b> y pega aquí la URL:
-      </p>
-    </div>
-
-    <div class="input-group">
-      <input type="url" id="script-url-new" class="input" placeholder="https://script.google.com/macros/s/...">
-    </div>
-    <button class="btn btn-accent btn-lg" style="width:100%; margin-top: 10px;" onclick="connectSystem()" id="btn-connect">Guardar y Conectar</button>
-  </div>
-</div>
-
-<div id="onboarding-wizard" class="auth-screen" style="display:none;">
-  <div class="auth-card" id="wizard-step-admin">
-    <div class="wizard-header">
-      <div class="wizard-step-indicator">Paso 1 de 3</div>
-      <div class="wizard-title">Configuración Inicial</div>
-      <div style="color:var(--text-muted);">Crea la cuenta del Administrador Principal</div>
-    </div>
-    
-    <div class="input-group"><label class="input-label">Tu Nombre (Dueño/Gerente)</label><input type="text" id="wiz-admin-name" class="input" placeholder="Ej: Carlos López"></div>
-    <div class="input-group"><label class="input-label">Crea un PIN de 4 dígitos</label><input type="number" id="wiz-admin-pin" class="input mono" placeholder="1234" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
-    
-    <button class="btn btn-accent btn-lg" style="width:100%; margin-top: 20px;" onclick="wizardSaveAdmin()">Guardar Administrador</button>
-  </div>
-
-  <div class="auth-card" id="wizard-step-team" style="display:none;">
-    <div class="wizard-header">
-      <div class="wizard-step-indicator">Paso 2 de 3</div>
-      <div class="wizard-title">Equipo de Trabajo</div>
-      <div style="color:var(--text-muted);">Agrega a tus cajeros (Puedes omitir esto)</div>
-    </div>
-    
-    <div class="input-group"><label class="input-label">Nombre del Cajero</label><input type="text" id="wiz-team-name" class="input" placeholder="Ej: Ana"></div>
-    <div class="input-group"><label class="input-label">PIN del Cajero</label><input type="number" id="wiz-team-pin" class="input mono" placeholder="5555" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);"></div>
-    <button class="btn btn-ghost" style="width:100%; margin-bottom: 20px;" onclick="wizardAddTeamMember()">+ Añadir Cajero</button>
-    
-    <div id="wiz-team-list" style="margin-bottom:20px; font-size:14px;"></div>
-    
-    <div style="display:flex; gap:10px; border-top: 1px solid var(--border); padding-top: 20px;">
-      <button class="btn btn-ghost" style="flex:1;" onclick="wizardNextStep('inventory')">Omitir</button>
-      <button class="btn btn-accent" style="flex:1;" onclick="wizardNextStep('inventory')">Siguiente</button>
-    </div>
-  </div>
-
-  <div class="auth-card" id="wizard-step-inventory" style="display:none;">
-    <div class="wizard-header">
-      <div class="wizard-step-indicator">Paso 3 de 3</div>
-      <div class="wizard-title">Primeros Productos</div>
-      <div style="color:var(--text-muted);">Agrega algo para empezar a vender (Opcional)</div>
-    </div>
-    
-    <div class="input-group"><label class="input-label">Nombre Producto</label><input type="text" id="wiz-prod-name" class="input"></div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <div class="input-group"><label class="input-label">Precio</label><input type="number" id="wiz-prod-price" class="input"></div>
-      <div class="input-group"><label class="input-label">Stock</label><input type="number" id="wiz-prod-stock" class="input"></div>
-    </div>
-    <button class="btn btn-ghost" style="width:100%; margin-bottom: 20px;" onclick="wizardAddProduct()">+ Añadir Producto</button>
-    
-    <div id="wiz-prod-list" style="margin-bottom:20px; font-size:14px;"></div>
-    
-    <div style="display:flex; gap:10px; border-top: 1px solid var(--border); padding-top: 20px;">
-      <button class="btn btn-accent btn-lg" style="width:100%;" onclick="wizardFinish()">¡Terminar e Ir al Sistema!</button>
-    </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="copyScript()">Copiar Código</button>
+        <p style="font-size:13px; color:var(--text-muted); margin-top:12px;">3. Haz <b>Implementar > Nueva Implementación</b> (App Web, Cualquier usuario) y pega la URL abajo.</p>
+     </div>
+     
+     <div class="input-group">
+       <input type="url" id="script-url-new" class="input" placeholder="https://script.google.com/macros/s/... (Pega tu URL aquí)">
+     </div>
+     <button class="btn btn-accent btn-lg" style="width:100%; margin-top:10px;" onclick="connectSystem()">Guardar y Conectar</button>
   </div>
 </div>
 
 <div id="login-screen" class="auth-screen" style="display:none;">
-  <div style="text-align:center; margin-bottom: 30px;">
-    <div style="font-size:36px; font-weight:800; color:var(--text);">Venta<span style="color:var(--accent)">Flow</span></div>
-    <div id="login-subtitle" style="color:var(--text-muted); font-size:16px; margin-top:8px;">¿Quién eres? Selecciona tu perfil</div>
+  <div style="text-align:center; margin-bottom: 20px;">
+    <div style="font-size: 42px; font-weight: 800; margin-bottom: 8px;">Venta<span style="color:var(--accent)">Flow</span></div>
+    <div id="login-subtitle" style="color:var(--text-muted); font-size: 15px;">Ingresa tu PIN de acceso</div>
   </div>
 
   <div id="user-selection-grid" class="user-grid"></div>
 
-  <div id="pin-pad-section" style="display:none; animation: slideUp 0.3s forwards; width:100%; max-width: 320px;">
+  <div id="pin-pad-section" style="display:none; width:100%; max-width: 320px;">
     <div style="text-align:center; margin-bottom:20px;">
       <div id="selected-user-name" style="font-size:24px; font-weight:700; color:var(--accent);">Usuario</div>
       <div id="btn-change-user" style="font-size:13px; color:var(--text-muted); cursor:pointer; text-decoration:underline; margin-top:4px;" onclick="cancelPinEntry()">← Cambiar usuario</div>
     </div>
-    
+
+    <div id="rescue-msg" style="display:none; color:#000; background:var(--accent); padding:16px; border-radius:var(--radius-sm); font-weight:700; margin-bottom: 20px; text-align:center; box-shadow:0 0 15px var(--accent-dim);">
+      ¡Sistema Nuevo Detectado!<br>Teclea <span style="font-size:22px; font-family:monospace; margin-left:6px;">0000</span> para comenzar la configuración inicial.
+    </div>
+
     <div id="pin-display">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
@@ -345,7 +296,51 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
       <button class="num-btn" onclick="addPin('1')">1</button><button class="num-btn" onclick="addPin('2')">2</button><button class="num-btn" onclick="addPin('3')">3</button>
       <button class="num-btn" onclick="addPin('4')">4</button><button class="num-btn" onclick="addPin('5')">5</button><button class="num-btn" onclick="addPin('6')">6</button>
       <button class="num-btn" onclick="addPin('7')">7</button><button class="num-btn" onclick="addPin('8')">8</button><button class="num-btn" onclick="addPin('9')">9</button>
-      <button class="num-btn" style="color:var(--red);" onclick="clearPin()">C</button><button class="num-btn" onclick="addPin('0')">0</button><button class="num-btn" style="color:var(--accent);" onclick="removePin()">⌫</button>
+      <button class="num-btn" style="color:var(--red); border-color:var(--border);" onclick="clearPin()">C</button><button class="num-btn" onclick="addPin('0')">0</button><button class="num-btn" style="color:var(--accent); border-color:var(--border);" onclick="removePin()">⌫</button>
+    </div>
+  </div>
+</div>
+
+<div id="onboarding-wizard" class="auth-screen" style="display:none;">
+  <div class="auth-card" id="wizard-step-1">
+    <div class="wizard-header">
+      <div class="wizard-step-indicator">Paso 1 de 3</div>
+      <div class="wizard-title">El Administrador Maestro</div>
+      <div style="color:var(--text-muted); font-size:14px;">Crea tu perfil con acceso total al sistema.</div>
+    </div>
+    <div class="input-group"><label class="input-label">Tu Nombre (Gerente/Dueño)</label><input type="text" id="wiz-admin-name" class="input" placeholder="Ej: Carlos"></div>
+    <div class="input-group"><label class="input-label">Crea tu PIN de seguridad (4 dígitos)</label><input type="number" id="wiz-admin-pin" class="input mono" placeholder="1234"></div>
+    <button class="btn btn-accent btn-lg" style="width:100%; margin-top:16px;" onclick="wizardSaveAdmin()">Guardar y Continuar</button>
+  </div>
+
+  <div class="auth-card" id="wizard-step-2" style="display:none;">
+    <div class="wizard-header">
+      <div class="wizard-step-indicator">Paso 2 de 3</div>
+      <div class="wizard-title">Datos del Negocio</div>
+      <div style="color:var(--text-muted); font-size:14px;">Configura cómo se verá tu tienda.</div>
+    </div>
+    <div class="input-group"><label class="input-label">Nombre Comercial</label><input type="text" id="wiz-store-name" class="input" placeholder="Ej: Mi Súper Tienda"></div>
+    <div class="input-group"><label class="input-label">Moneda Principal (Símbolo)</label><input type="text" id="wiz-store-currency" class="input" value="MXN"></div>
+    <button class="btn btn-accent btn-lg" style="width:100%; margin-top:16px;" onclick="wizardSaveStore()">Guardar y Continuar</button>
+  </div>
+
+  <div class="auth-card" id="wizard-step-3" style="display:none; max-width:700px;">
+    <div class="wizard-header">
+      <div class="wizard-step-indicator">Paso 3 de 3</div>
+      <div class="wizard-title">Tu Equipo de Trabajo</div>
+      <div style="color:var(--text-muted); font-size:14px;">Agrega a los cajeros o gerentes (Puedes omitir este paso).</div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+      <div class="input-group"><label class="input-label">Nombre</label><input type="text" id="wiz-staff-name" class="input"></div>
+      <div class="input-group"><label class="input-label">PIN</label><input type="number" id="wiz-staff-pin" class="input mono"></div>
+      <div class="input-group"><label class="input-label">Rol</label><select id="wiz-staff-role" class="input"><option value="cajero">Cajero (Solo Ventas)</option><option value="gerente">Gerente (Inventario y Ventas)</option></select></div>
+    </div>
+    <button class="btn btn-ghost" style="width:100%; margin-bottom:16px;" onclick="wizardAddStaff()">+ Añadir Usuario</button>
+    <div id="wiz-staff-list" style="margin-bottom:20px; font-size:14px;"></div>
+    
+    <div style="display:flex; gap:10px; border-top:1px solid var(--border); padding-top:20px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="wizardFinish()">Omitir y Terminar</button>
+      <button class="btn btn-accent" style="flex:1;" onclick="wizardFinish()">Finalizar Configuración</button>
     </div>
   </div>
 </div>
@@ -358,32 +353,38 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
     </div>
     
     <div class="nav">
-      <div class="nav-section role-cajero">Operación POS</div>
-      <button class="nav-btn role-cajero active" onclick="switchPage('pos')" id="nav-pos">
+      <div class="nav-section">Operación</div>
+      <button class="nav-btn active" onclick="switchPage('pos')" id="nav-pos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> <span>Punto de Venta</span>
       </button>
-      <button class="nav-btn role-cajero" onclick="switchPage('sales-hist')" id="nav-sales-hist">
+      <button class="nav-btn role-cajero" onclick="switchPage('my-stats')" id="nav-my-stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg> <span>Mis Metas</span>
+      </button>
+      <button class="nav-btn" onclick="switchPage('sales-hist')" id="nav-sales-hist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="14 2 14 8 20 8"/><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg> <span>Historial de Ventas</span>
       </button>
 
-      <div class="nav-section role-admin">Administración</div>
-      <button class="nav-btn role-admin" onclick="switchPage('reports')" id="nav-reports">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span>Dashboard y Reportes</span>
+      <div class="nav-section role-manager">Administración</div>
+      <button class="nav-btn role-manager" onclick="switchPage('reports')" id="nav-reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span>Dashboard Gráfico</span>
       </button>
-      <button class="nav-btn role-admin" onclick="switchPage('inventory')" id="nav-inventory">
+      <button class="nav-btn role-manager" onclick="switchPage('inventory')" id="nav-inventory">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> <span>Inventario</span>
       </button>
-      <button class="nav-btn role-admin" onclick="switchPage('crm')" id="nav-crm">
+      <button class="nav-btn role-manager" onclick="switchPage('crm')" id="nav-crm">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> <span>Clientes CRM</span>
       </button>
-      <button class="nav-btn role-admin" onclick="switchPage('users')" id="nav-users">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Personal y Accesos</span>
+      <button class="nav-btn role-manager" onclick="switchPage('suppliers')" id="nav-suppliers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0020 16z"/></svg> <span>Proveedores</span>
+      </button>
+      <button class="nav-btn role-manager" onclick="switchPage('users')" id="nav-users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Personal & Metas</span>
       </button>
     </div>
     
     <div class="sidebar-footer role-admin">
       <button class="nav-btn" onclick="openSettings()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 005 19.07M4.93 4.93A10 10 0 0019 19.07"/></svg> <span>Ajustes de Sistema</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 005 19.07M4.93 4.93A10 10 0 0019 19.07"/></svg> <span>Configuración App</span>
       </button>
     </div>
   </div>
@@ -394,9 +395,9 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
       <div class="topbar-actions">
         <button class="btn btn-ghost btn-sm" onclick="syncAllData()" id="btn-sync">↻ Sincronizar DB</button>
         <div class="user-profile" onclick="logout()" title="Cerrar Sesión">
-          <div class="user-avatar" id="topbar-avatar">C</div>
+          <div class="user-avatar" id="topbar-avatar">U</div>
           <div class="user-info">
-            <span class="user-name" id="topbar-name">Cajero</span>
+            <span class="user-name" id="topbar-name">Usuario</span>
             <span class="user-role" id="topbar-role">Rol</span>
           </div>
         </div>
@@ -404,14 +405,11 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
     </div>
 
     <div id="page-pos" class="content page active">
-      <div class="role-admin" style="background:var(--warning); color:#000; padding:12px; border-radius:var(--radius-sm); margin-bottom:16px; font-weight:600; display:none;">
-        ⚠️ Modo Administrador: Las ventas no deberían realizarse con esta cuenta para no alterar estadísticas de cajeros.
-      </div>
       <div class="pos-layout">
         <div class="pos-left">
           <div class="barcode-bar">
             <input type="text" id="barcode-input" class="input" placeholder="Buscar producto o escanear..." autocomplete="off">
-            <button class="btn btn-ghost btn-sm" onclick="openBarcodeScanner()" title="Usar Cámara">📷 Cámara</button>
+            <button class="btn btn-ghost btn-sm" onclick="openBarcodeScanner()">📷 Cámara</button>
           </div>
           <div class="products-grid" id="pos-products"></div>
         </div>
@@ -437,10 +435,25 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
       </div>
     </div>
 
-    <div id="page-reports" class="content page">
-      <div class="top-controls">
-        <button class="btn btn-ghost" onclick="exportData('history')">📥 Exportar Historial CSV</button>
+    <div id="page-my-stats" class="content page">
+      <div class="card" style="text-align:center; padding:40px;">
+        <h2 style="margin-bottom:20px; color:var(--text);">Mi Progreso de Ventas</h2>
+        <div style="display:flex; justify-content:center; gap:40px; margin-bottom:30px;">
+          <div><div style="font-size:14px; color:var(--text-muted)">Ventas de Hoy</div><div style="font-size:32px; font-weight:800; color:var(--accent)" id="my-sales-today">$0.00</div></div>
+          <div><div style="font-size:14px; color:var(--text-muted)">Ventas del Mes</div><div style="font-size:32px; font-weight:800; color:var(--blue)" id="my-sales-month">$0.00</div></div>
+        </div>
+        <div style="background:var(--surface2); padding:20px; border-radius:var(--radius); max-width:400px; margin:0 auto;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="font-weight:600;">Meta Mensual</span><span id="my-goal-target" class="mono">$0.00</span></div>
+          <div style="background:var(--bg); border-radius:100px; height:12px; overflow:hidden; margin-bottom:8px;">
+            <div id="my-goal-bar" style="background:linear-gradient(90deg, var(--accent), var(--blue)); height:100%; width:0%; transition:1s;"></div>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); text-align:right;" id="my-goal-percent">0% alcanzado</div>
+        </div>
       </div>
+    </div>
+
+    <div id="page-reports" class="content page">
+      <div class="top-controls"><button class="btn btn-ghost" onclick="exportData('history')">📥 Exportar Reporte Global CSV</button></div>
       <div class="stats-grid" id="report-stats"></div>
       <div class="card" style="margin-bottom: 24px;">
         <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
@@ -456,49 +469,39 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
         <button class="btn btn-accent" onclick="openProductModal()">+ Nuevo Producto</button>
         <button class="btn btn-ghost" style="margin-left:auto" onclick="exportData('inventory')">📥 Exportar CSV</button>
       </div>
-      <div class="card" style="padding:0">
-        <div class="table-wrap">
-          <table id="inv-table"><thead><tr><th>Código</th><th>Producto</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead><tbody id="inv-tbody"></tbody></table>
-        </div>
-      </div>
+      <div class="card" style="padding:0"><div class="table-wrap"><table id="inv-table"><thead><tr><th>Código</th><th>Producto</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead><tbody id="inv-tbody"></tbody></table></div></div>
     </div>
 
     <div id="page-crm" class="content page">
-      <div class="top-controls">
-        <input type="text" id="crm-search" class="input" style="max-width:250px;" placeholder="Buscar cliente..." oninput="renderCRM()">
-        <button class="btn btn-accent" onclick="openCustomerModal()">+ Nuevo Cliente</button>
-        <button class="btn btn-ghost" style="margin-left:auto" onclick="exportData('crm')">📥 Exportar CSV</button>
-      </div>
-      <div class="card" style="padding:0">
-        <div class="table-wrap">
-          <table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Compras</th><th>Monto Total</th><th>Acciones</th></tr></thead><tbody id="crm-tbody"></tbody></table>
-        </div>
-      </div>
+      <div class="top-controls"><input type="text" id="crm-search" class="input" style="max-width:250px;" placeholder="Buscar cliente..." oninput="renderCRM()"><button class="btn btn-accent" onclick="openCustomerModal()">+ Nuevo Cliente</button><button class="btn btn-ghost" style="margin-left:auto" onclick="exportData('crm')">📥 Exportar CSV</button></div>
+      <div class="card" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Compras</th><th>Monto Total</th><th>Acciones</th></tr></thead><tbody id="crm-tbody"></tbody></table></div></div>
+    </div>
+
+    <div id="page-suppliers" class="content page">
+      <div class="top-controls"><button class="btn btn-accent" onclick="openSupplierModal()">+ Nuevo Proveedor</button></div>
+      <div class="card" style="padding:0"><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Contacto</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr></thead><tbody id="suppliers-tbody"></tbody></table></div></div>
     </div>
 
     <div id="page-users" class="content page">
       <div style="background:var(--surface2); padding:16px; border-radius:var(--radius-sm); margin-bottom:16px; font-size:13px; color:var(--text-muted); line-height: 1.5;">
-        <b>💡 Gestión de Permisos:</b><br>
-        - Los <b>Cajeros</b> únicamente tienen acceso al Punto de Venta y a ver su propio historial de tickets del día.<br>
-        - Los <b>Administradores</b> tienen acceso total al Inventario, Alta de Usuarios, Exportación de datos y Gráficos financieros.
+        <b>💡 Gestión de Roles:</b><br>- <b>Admin Maestro:</b> Acceso total inamovible.<br>- <b>Gerente:</b> Puede crear productos, clientes y cajeros (no puede alterar al Admin).<br>- <b>Cajero:</b> Solo vende y ve sus propias metas de ventas.
       </div>
       <div class="top-controls"><button class="btn btn-accent" onclick="openUserModal(null)">+ Nuevo Empleado</button></div>
       <div class="card" style="padding:0;">
         <div class="table-wrap">
-          <table><thead><tr><th>Nombre</th><th>Rol de Acceso</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="users-tbody"></tbody></table>
+          <table><thead><tr><th>Nombre</th><th>Rol</th><th>Meta Mensual</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="users-tbody"></tbody></table>
         </div>
       </div>
     </div>
 
     <div id="page-sales-hist" class="content page">
-      <div class="top-controls">
+      <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center;">
         <input type="date" id="hist-from" class="input" style="max-width:140px"> <span style="color:var(--text-muted)">a</span> <input type="date" id="hist-to" class="input" style="max-width:140px">
         <button class="btn btn-accent" onclick="renderHistory()">Filtrar</button>
-        <button class="btn btn-ghost role-admin" style="margin-left:auto" onclick="exportData('history')">📥 Exportar CSV</button>
       </div>
       <div class="card" style="padding:0">
         <div class="table-wrap">
-          <table><thead><tr><th>ID Ticket</th><th>Fecha y Hora</th><th>Atendido por</th><th>Método</th><th>Total</th></tr></thead><tbody id="hist-tbody"></tbody></table>
+          <table><thead><tr><th>ID Ticket</th><th>Fecha</th><th>Vendedor</th><th>Método</th><th>Total</th></tr></thead><tbody id="hist-tbody"></tbody></table>
         </div>
       </div>
     </div>
@@ -507,40 +510,42 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
 
 <div class="modal-overlay" id="user-modal" style="display:none">
   <div class="modal" style="max-width:400px;">
-    <div class="modal-header"><div class="modal-title" id="user-modal-title">Usuario del Sistema</div><button class="btn btn-ghost btn-sm" onclick="closeModal('user-modal')">✕</button></div>
+    <div class="modal-header"><div class="modal-title" id="user-modal-title">Perfil de Empleado</div><button class="btn btn-ghost btn-sm" onclick="closeModal('user-modal')">✕</button></div>
     <div class="modal-body">
-      <div class="input-group"><label class="input-label">Nombre Completo *</label><input type="text" id="user-name" class="input" placeholder="Ej: Ana Cajera"></div>
-      <div class="input-group"><label class="input-label">PIN de Seguridad (4 dígitos) *</label><input type="number" id="user-pin" class="input mono" placeholder="1234"></div>
-      <div class="input-group"><label class="input-label">Nivel de Acceso</label><select id="user-role" class="input"><option value="cajero">Cajero (Solo vender)</option><option value="admin">Administrador (Ver Reportes e Inventario)</option></select></div>
+      <div class="input-group"><label class="input-label">Nombre Completo *</label><input type="text" id="user-name" class="input"></div>
+      <div class="input-group"><label class="input-label">PIN (4 dígitos) *</label><input type="number" id="user-pin" class="input mono" placeholder="1234"></div>
+      <div class="input-group"><label class="input-label">Nivel de Acceso</label><select id="user-role" class="input"><option value="cajero">Cajero (Solo Caja y Metas)</option><option value="gerente">Gerente (Inventario y Reportes)</option><option value="admin">Administrador Maestro</option></select></div>
+      <div class="input-group"><label class="input-label">Meta de Venta Mensual ($)</label><input type="number" id="user-goal" class="input" placeholder="Ej: 50000"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('user-modal')">Cancelar</button><button class="btn btn-accent" onclick="saveUserApp()">Guardar</button></div>
   </div>
 </div>
 
+<div class="modal-overlay" id="supplier-modal" style="display:none">
+  <div class="modal"><div class="modal-header"><div class="modal-title">Proveedor</div><button class="btn btn-ghost btn-sm" onclick="closeModal('supplier-modal')">✕</button></div>
+  <div class="modal-body"><div class="input-group"><label class="input-label">Empresa</label><input type="text" id="sup-company" class="input"></div><div class="input-group"><label class="input-label">Nombre Contacto</label><input type="text" id="sup-name" class="input"></div><div class="input-group"><label class="input-label">Teléfono</label><input type="text" id="sup-phone" class="input"></div><div class="input-group"><label class="input-label">Email</label><input type="email" id="sup-email" class="input"></div></div>
+  <div class="modal-footer"><button class="btn btn-accent" onclick="saveSupplier()">Guardar Proveedor</button></div></div>
+</div>
+
 <div class="modal-overlay" id="cash-modal" style="display:none"><div class="modal" style="max-width:400px"><div class="modal-header"><div class="modal-title">Pago en Efectivo</div></div><div class="modal-body" style="padding:24px;"><div style="text-align:center; font-size:14px; color:var(--text-muted);">Total a Cobrar</div><div style="text-align:center; font-size:36px; font-weight:800; color:var(--accent); font-family:monospace; margin-bottom:20px;" id="cash-total-display">$0.00</div><div class="input-group"><input type="number" id="cash-received" class="input" style="font-size:24px; text-align:center; font-family:monospace;" placeholder="Monto Recibido" oninput="calculateChange()"></div><div style="text-align:center; font-size:14px; color:var(--text-muted); margin-top:20px;">Cambio a Devolver</div><div style="text-align:center; font-size:28px; font-weight:700; color:var(--green); font-family:monospace;" id="cash-change-display">$0.00</div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('cash-modal')">Cancelar</button><button class="btn btn-green" id="btn-confirm-cash" onclick="confirmCashCheckout()">Confirmar Venta</button></div></div></div>
-
 <div class="modal-overlay" id="product-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Producto</div><button class="btn btn-ghost btn-sm" onclick="closeModal('product-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Código de Barras</label><input type="text" id="prod-barcode" class="input mono"></div><div class="input-group"><label class="input-label">Nombre</label><input type="text" id="prod-name" class="input"></div><div class="input-group"><label class="input-label">Categoría</label><input type="text" id="prod-category" class="input" placeholder="Ej: General"></div><div class="input-group"><label class="input-label">Precio</label><input type="number" id="prod-price" class="input"></div><div class="input-group"><label class="input-label">Stock</label><input type="number" id="prod-stock" class="input"></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancelar</button><button class="btn btn-accent" onclick="saveProduct()">Guardar Producto</button></div></div></div>
-
 <div class="modal-overlay" id="customer-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Cliente</div><button class="btn btn-ghost btn-sm" onclick="closeModal('customer-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Nombre</label><input type="text" id="cust-name" class="input"></div><div class="input-group"><label class="input-label">Teléfono</label><input type="text" id="cust-phone" class="input"></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveCustomer()">Guardar</button></div></div></div>
-
-<div class="modal-overlay" id="settings-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Ajustes</div><button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Negocio</label><input type="text" id="settings-biz" class="input"></div><div class="input-group"><label class="input-label">URL Base de Datos</label><input type="url" id="settings-url" class="input"></div><div style="margin-top:20px"><button class="btn btn-danger" style="width:100%" onclick="resetApp()">Desvincular y Borrar Datos Locales</button></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveSettings()">Guardar Cambios</button></div></div></div>
-
+<div class="modal-overlay" id="settings-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Configuración</div><button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Negocio</label><input type="text" id="settings-biz" class="input"></div><div class="input-group"><label class="input-label">URL Base de Datos</label><input type="url" id="settings-url" class="input"></div><div style="margin-top:20px"><button class="btn btn-danger" style="width:100%" onclick="resetApp()">Desvincular y Borrar Datos Locales</button></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveSettings()">Guardar Cambios</button></div></div></div>
 <div class="modal-overlay" id="receipt-modal" style="display:none"><div class="modal" style="max-width:350px"><div class="modal-header"><div class="modal-title" style="color:var(--green)">✓ Venta Exitosa</div></div><div class="modal-body" id="receipt-body" style="text-align:center; padding:24px;"></div><div class="modal-footer" style="flex-direction:column; gap:10px;"><button class="btn btn-ghost" style="width:100%" onclick="printReceipt()">🖨️ Imprimir Ticket</button><button class="btn btn-accent" style="width:100%" onclick="closeModal('receipt-modal')">Siguiente Venta</button></div></div></div>
 
 <script>
-let state = { config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN' }, currentUser: null, userLoginSelected: null, users: [], products: [], customers: [], sales: [], cart: [], currentCat: '', editingUserId: null, editingProductId: null, editingCustomerId: null, lastReceiptData: null };
+let state = { config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN' }, currentUser: null, userLoginSelected: null, users: [], products: [], customers: [], sales: [], suppliers: [], cart: [], currentCat: '', editingUserId: null, editingProductId: null, editingCustomerId: null, editingSupplierId: null, lastReceiptData: null };
 const formatMoney = (a) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: state.config.currency }).format(a);
 let salesChartInstance = null;
 
 // ── 1. INICIO Y ENRUTAMIENTO ──
 window.addEventListener('load', async () => {
-  const cfg = localStorage.getItem('vflow_db_v7'); 
+  const cfg = localStorage.getItem('vflow_db_v8'); 
   if(cfg) { try { state.config = JSON.parse(cfg); } catch(e){} }
   
   if(!state.config.scriptUrl) {
     document.getElementById('setup-screen').style.display = 'flex';
   } else {
-    // Si ya hay URL, mostrar pantalla de loading silencioso
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('user-selection-grid').style.display = 'none';
     document.getElementById('pin-pad-section').style.display = 'none';
@@ -548,13 +553,14 @@ window.addEventListener('load', async () => {
     
     await syncAllData();
     
-    // El punto clave de decisión:
     if(!state.users || state.users.length === 0) {
-      // BASE VACIA -> Lanzar Wizard Onboarding
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('onboarding-wizard').style.display = 'flex';
+      // BASE VACIA -> Pide 0000 para abrir Wizard
+      document.getElementById('login-subtitle').textContent = "Sistema Nuevo";
+      document.getElementById('pin-pad-section').style.display = 'block';
+      document.getElementById('selected-user-name').textContent = "Inicialización";
+      document.getElementById('btn-change-user').style.display = 'none';
+      document.getElementById('rescue-msg').style.display = 'block';
     } else {
-      // HAY USUARIOS -> Lanzar Pantalla Login Normal
       renderUserSelection();
     }
   }
@@ -567,92 +573,49 @@ window.addEventListener('load', async () => {
       if (e.key >= '0' && e.key <= '9') addPin(e.key); else if (e.key === 'Backspace') removePin();
     }
   });
+  
+  const t = new Date(); document.getElementById('hist-to').value = t.toISOString().split('T')[0];
+  t.setDate(t.getDate()-7); document.getElementById('hist-from').value = t.toISOString().split('T')[0];
 });
 
 function copyScript() { navigator.clipboard.writeText(document.getElementById('apps-script-code').textContent); toast('Código copiado', 'success'); }
-function showSetupStep(s) { document.getElementById('setup-choice').style.display='none'; if(s==='new') document.getElementById('setup-new').style.display='block'; else document.getElementById('setup-existing').style.display='block'; }
 
 async function connectSystem() {
-    const url = document.getElementById('script-url-new').value.trim() || document.getElementById('script-url-exist').value.trim();
+    const url = document.getElementById('script-url-new').value.trim();
     if(!url) { toast('Ingresa la URL', 'error'); return; }
-    state.config.scriptUrl = url; localStorage.setItem('vflow_db_v7', JSON.stringify(state.config)); location.reload(); 
+    state.config.scriptUrl = url; localStorage.setItem('vflow_db_v8', JSON.stringify(state.config)); location.reload(); 
 }
 
 async function apiCall(params) { try { return await (await fetch(state.config.scriptUrl, { method: 'POST', body: JSON.stringify(params) })).json(); } catch (e) { return null; } }
 
 async function syncAllData() {
   const btn = document.getElementById('btn-sync'); if(btn) btn.textContent = "Sincronizando...";
-  const [p, u, c, s] = await Promise.all([ apiCall({ action: 'read', tab: 'Productos' }), apiCall({ action: 'read', tab: 'Usuarios' }), apiCall({ action: 'read', tab: 'Clientes' }), apiCall({ action: 'read', tab: 'Ventas' }) ]);
-  if(p?.ok) state.products = p.rows; if(u?.ok) state.users = u.rows; if(c?.ok) state.customers = c.rows; if(s?.ok) state.sales = s.rows;
-  if(state.currentUser) { renderPOSProducts(); renderInventory(); renderCRM(); populateCustomerSelect(); if(state.currentUser.role === 'admin') renderReports(); renderUsers();}
+  const [p, u, c, s, sp] = await Promise.all([
+    apiCall({ action: 'read', tab: 'Productos' }), apiCall({ action: 'read', tab: 'Usuarios' }), 
+    apiCall({ action: 'read', tab: 'Clientes' }), apiCall({ action: 'read', tab: 'Ventas' }), apiCall({ action: 'read', tab: 'Proveedores' })
+  ]);
+  if(p?.ok) state.products = p.rows; if(u?.ok) state.users = u.rows; 
+  if(c?.ok) state.customers = c.rows; if(s?.ok) state.sales = s.rows; if(sp?.ok) state.suppliers = sp.rows;
+  
+  if(state.currentUser) { 
+    renderPOSProducts(); renderInventory(); renderCRM(); populateCustomerSelect(); renderHistory(); renderUsers(); renderSuppliers();
+    if(state.currentUser.role === 'admin' || state.currentUser.role === 'gerente') renderReports();
+    if(state.currentUser.role === 'cajero') renderMyStats();
+  }
   if(btn) btn.textContent = "↻ Sincronizar DB";
 }
 
-// ── 2. WIZARD ONBOARDING (BASE VACIA) ──
-async function wizardSaveAdmin() {
-  const name = document.getElementById('wiz-admin-name').value.trim();
-  const pin = document.getElementById('wiz-admin-pin').value.trim();
-  if(!name || pin.length !== 4) { toast('Nombre y PIN de 4 dígitos requeridos', 'error'); return; }
-  
-  const u = {id: 'U'+Date.now(), name, pin, role: 'admin', active: 'true'};
-  state.users.push(u); await apiCall({action:'write',tab:'Usuarios',rows:[u]});
-  
-  // Guardarlo como logueado
-  state.currentUser = u;
-  document.getElementById('wizard-step-admin').style.display = 'none';
-  document.getElementById('wizard-step-team').style.display = 'block';
-  toast('Admin guardado', 'success');
-}
-
-async function wizardAddTeamMember() {
-  const name = document.getElementById('wiz-team-name').value.trim();
-  const pin = document.getElementById('wiz-team-pin').value.trim();
-  if(!name || pin.length !== 4) { toast('Falta nombre o PIN', 'error'); return; }
-  
-  const u = {id: 'U'+Date.now(), name, pin, role: 'cajero', active: 'true'};
-  state.users.push(u); await apiCall({action:'write',tab:'Usuarios',rows:[u]});
-  
-  document.getElementById('wiz-team-name').value = ''; document.getElementById('wiz-team-pin').value = '';
-  document.getElementById('wiz-team-list').innerHTML += `<div style="background:var(--surface2); padding:8px; border-radius:4px; margin-bottom:4px;">✓ ${name} (Cajero)</div>`;
-  toast('Cajero agregado', 'success');
-}
-
-function wizardNextStep(step) { document.getElementById('wizard-step-team').style.display = 'none'; document.getElementById('wizard-step-inventory').style.display = 'block'; }
-
-async function wizardAddProduct() {
-  const name = document.getElementById('wiz-prod-name').value.trim();
-  const price = document.getElementById('wiz-prod-price').value.trim();
-  const stock = document.getElementById('wiz-prod-stock').value.trim();
-  if(!name || !price) { toast('Falta nombre o precio', 'error'); return; }
-  
-  const p = {id: 'P'+Date.now(), name, barcode: '', category: 'General', price, stock: stock||0, cost:0, unit:'pza'};
-  state.products.push(p); await apiCall({action:'write',tab:'Productos',rows:[p]});
-  
-  document.getElementById('wiz-prod-name').value = ''; document.getElementById('wiz-prod-price').value = ''; document.getElementById('wiz-prod-stock').value = '';
-  document.getElementById('wiz-prod-list').innerHTML += `<div style="background:var(--surface2); padding:8px; border-radius:4px; margin-bottom:4px;">📦 ${name} - ${formatMoney(price)}</div>`;
-  toast('Producto agregado', 'success');
-}
-
-function wizardFinish() {
-  document.getElementById('onboarding-wizard').style.display = 'none';
-  document.getElementById('main-app').style.display = 'flex';
-  document.getElementById('topbar-name').textContent = state.currentUser.name;
-  document.getElementById('topbar-role').textContent = 'ADMINISTRADOR';
-  document.getElementById('topbar-avatar').textContent = state.currentUser.name.charAt(0).toUpperCase();
-  applyRoles('admin'); switchPage('reports');
-  toast('¡Configuración terminada! Bienvenido.', 'success');
-}
-
-// ── 3. LOGIN DIARIO NORMAL ──
+// ── 2. LOGIN Y SELECCIÓN DE USUARIO ──
 let currentPin = ''; let isAuthenticating = false;
 
 function renderUserSelection() {
     const grid = document.getElementById('user-selection-grid'); grid.style.display = 'grid'; 
-    document.getElementById('pin-pad-section').style.display = 'none'; 
+    document.getElementById('pin-pad-section').style.display = 'none'; document.getElementById('rescue-msg').style.display = 'none';
     document.getElementById('login-subtitle').textContent = "¿Quién eres? Selecciona tu perfil";
+    
     grid.innerHTML = state.users.filter(u=>u.active!=='false').map(u => {
-        const isAdmin = u.role === 'admin';
-        return `<div class="user-card ${isAdmin ? 'admin' : ''}" onclick="selectUserForLogin('${u.id}')">${isAdmin ? '<div class="admin-crown">👑</div>' : ''}<div class="user-card-avatar">${u.name.charAt(0).toUpperCase()}</div><div class="user-card-name">${u.name}</div><div class="user-card-role">${isAdmin ? 'Administrador' : 'Cajero'}</div></div>`
+        const isAdmin = u.role === 'admin'; const isGerente = u.role === 'gerente';
+        return `<div class="user-card ${isAdmin?'admin':(isGerente?'gerente':'')}" onclick="selectUserForLogin('${u.id}')">${isAdmin?'<div class="admin-crown">👑</div>':''}<div class="user-card-avatar">${u.name.charAt(0).toUpperCase()}</div><div class="user-card-name">${u.name}</div><div class="user-card-role">${isAdmin?'Admin Maestro':(isGerente?'Gerente':'Cajero')}</div></div>`;
     }).join('');
 }
 
@@ -660,6 +623,7 @@ function selectUserForLogin(id) {
     state.userLoginSelected = state.users.find(u => u.id === id);
     document.getElementById('user-selection-grid').style.display = 'none';
     document.getElementById('pin-pad-section').style.display = 'block';
+    document.getElementById('btn-change-user').style.display = 'block';
     document.getElementById('login-subtitle').textContent = "Ingresa tu PIN";
     document.getElementById('selected-user-name').textContent = state.userLoginSelected.name;
     clearPin();
@@ -675,28 +639,46 @@ function removePin() { currentPin = currentPin.slice(0, -1); updatePinDisplay();
 function updatePinDisplay() { document.querySelectorAll('.pin-dot').forEach((dot, i) => { dot.classList.toggle('filled', i < currentPin.length); }); }
 
 function attemptLogin() {
+  if (state.users.length === 0 && currentPin === '0000') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('onboarding-wizard').style.display = 'flex';
+    isAuthenticating = false; return;
+  }
+  
+  if (!state.userLoginSelected) { isAuthenticating = false; return; }
+
   if (String(state.userLoginSelected.pin) === currentPin) {
     state.currentUser = state.userLoginSelected;
     document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'flex';
     document.getElementById('topbar-name').textContent = state.currentUser.name;
-    document.getElementById('topbar-role').textContent = state.currentUser.role === 'admin' ? 'Administrador' : 'Cajero';
+    document.getElementById('topbar-role').textContent = state.currentUser.role.toUpperCase();
     document.getElementById('topbar-avatar').textContent = state.currentUser.name.charAt(0).toUpperCase();
     
     applyRoles(state.currentUser.role);
     populateCustomerSelect(); renderPOSProducts();
-    if(state.currentUser.role === 'admin') switchPage('reports'); else switchPage('pos');
+    if(state.currentUser.role === 'admin' || state.currentUser.role === 'gerente') switchPage('reports'); else switchPage('pos');
+    toast(`¡Hola, ${state.currentUser.name}!`, 'success');
   } else { toast('PIN Incorrecto', 'error'); clearPin(); }
   isAuthenticating = false;
 }
 
 function logout() { state.currentUser = null; state.userLoginSelected = null; currentPin = ''; updatePinDisplay(); document.getElementById('main-app').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex'; renderUserSelection(); }
 
+// ── 3. ROLES Y NAVEGACIÓN ESTRICTA ──
 function applyRoles(role) { 
-  const isCaj = role === 'cajero'; 
-  document.querySelectorAll('.role-admin').forEach(el => el.style.display = isCaj ? 'none' : '');
+  const isAdmin = role === 'admin'; const isGerente = role === 'gerente'; const isCaj = role === 'cajero';
+  
+  document.querySelectorAll('.role-admin').forEach(el => el.style.display = isAdmin ? '' : 'none');
+  document.querySelectorAll('.role-manager').forEach(el => el.style.display = (isAdmin || isGerente) ? '' : 'none');
   document.querySelectorAll('.role-cajero').forEach(el => el.style.display = isCaj ? '' : 'none');
-  ['nav-inventory', 'nav-crm', 'nav-reports', 'nav-users'].forEach(id => { document.getElementById(id).style.display = isCaj ? 'none' : 'flex'; }); 
-  document.querySelector('.sidebar-footer').style.display = isCaj ? 'none' : 'block'; 
+  
+  document.getElementById('nav-reports').style.display = (isAdmin || isGerente) ? 'flex' : 'none';
+  document.getElementById('nav-inventory').style.display = (isAdmin || isGerente) ? 'flex' : 'none';
+  document.getElementById('nav-crm').style.display = (isAdmin || isGerente) ? 'flex' : 'none';
+  document.getElementById('nav-suppliers').style.display = (isAdmin || isGerente) ? 'flex' : 'none';
+  document.getElementById('nav-users').style.display = (isAdmin || isGerente) ? 'flex' : 'none';
+  document.getElementById('nav-my-stats').style.display = isCaj ? 'flex' : 'none';
+  document.querySelector('.sidebar-footer').style.display = isAdmin ? 'block' : 'none'; 
 }
 
 function switchPage(page) { 
@@ -704,36 +686,110 @@ function switchPage(page) {
   document.querySelectorAll('.page, .nav-btn').forEach(el => el.classList.remove('active')); 
   document.getElementById(`page-${page}`).classList.add('active'); 
   const btn = document.getElementById(`nav-${page}`); if(btn) btn.classList.add('active');
-  const t = { pos: 'Punto de Venta', inventory: 'Inventario', crm: 'Clientes CRM', reports: 'Dashboard', 'sales-hist': 'Historial de Ventas', users: 'Personal y Accesos' }; 
+  const t = { pos: 'Punto de Venta', inventory: 'Inventario', crm: 'Clientes', reports: 'Dashboard', 'sales-hist': 'Historial', users: 'Personal y Metas', suppliers: 'Proveedores', 'my-stats': 'Mis Metas' }; 
   document.getElementById('page-title').textContent = t[page]; 
-  if(page==='users')renderUsers(); if(page==='inventory')renderInventory(); if(page==='sales-hist')renderHistory(); if(page==='reports')renderReports(); if(page==='crm')renderCRM();
+  if(page==='users')renderUsers(); if(page==='inventory')renderInventory(); if(page==='sales-hist')renderHistory(); if(page==='reports')renderReports(); if(page==='crm')renderCRM(); if(page==='suppliers')renderSuppliers(); if(page==='my-stats')renderMyStats();
 }
 
-// ── 4. GESTIÓN USUARIOS (DENTRO DE LA APP) ──
+// ── 4. WIZARD DE ONBOARDING ──
+async function wizardSaveAdmin() {
+  const name = document.getElementById('wiz-admin-name').value.trim(); const pin = document.getElementById('wiz-admin-pin').value.trim();
+  if(!name || pin.length !== 4) { toast('Falta nombre o PIN (4 dígitos)', 'error'); return; }
+  const u = {id: 'U'+Date.now(), name, pin, role: 'admin', active: 'true'};
+  state.users.push(u); await apiCall({action:'write',tab:'Usuarios',rows:[u]});
+  state.currentUser = u; // Lo logueamos internamente
+  document.getElementById('wizard-step-1').style.display = 'none'; document.getElementById('wizard-step-2').style.display = 'block';
+}
+
+function wizardSaveStore() {
+  state.config.bizName = document.getElementById('wiz-store-name').value.trim() || 'Mi Tienda';
+  state.config.currency = document.getElementById('wiz-store-currency').value.trim() || 'MXN';
+  localStorage.setItem('vflow_db_v8', JSON.stringify(state.config));
+  document.getElementById('wizard-step-2').style.display = 'none'; document.getElementById('wizard-step-3').style.display = 'block';
+}
+
+async function wizardAddStaff() {
+  const name = document.getElementById('wiz-staff-name').value.trim(); const pin = document.getElementById('wiz-staff-pin').value.trim(); const role = document.getElementById('wiz-staff-role').value;
+  if(!name || pin.length !== 4) { toast('Faltan datos', 'error'); return; }
+  const u = {id: 'U'+Date.now(), name, pin, role, active: 'true'};
+  state.users.push(u); await apiCall({action:'write',tab:'Usuarios',rows:[u]});
+  document.getElementById('wiz-staff-name').value = ''; document.getElementById('wiz-staff-pin').value = '';
+  document.getElementById('wiz-staff-list').innerHTML += `<div style="background:var(--surface2); padding:8px; margin-bottom:4px; border-radius:4px;">✓ ${name} (${role})</div>`;
+}
+
+function wizardFinish() {
+  document.getElementById('onboarding-wizard').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  document.getElementById('biz-name-display').textContent = state.config.bizName;
+  document.getElementById('topbar-name').textContent = state.currentUser.name;
+  document.getElementById('topbar-role').textContent = 'Admin Maestro';
+  document.getElementById('topbar-avatar').textContent = state.currentUser.name.charAt(0).toUpperCase();
+  applyRoles('admin'); switchPage('reports'); toast('¡Bienvenido a VentaFlow!', 'success');
+}
+
+// ── 5. GESTIÓN DE USUARIOS (JERARQUÍA Y METAS) ──
 function renderUsers() { 
     const tb = document.getElementById('users-tbody');
-    tb.innerHTML=state.users.map(u=>`<tr><td style="font-weight:600">${u.name} ${u.id===state.currentUser?.id?'(Tú)':''}</td><td><span class="badge ${u.role==='admin'?'badge-blue':'badge-amber'}">${u.role.toUpperCase()}</span></td><td><span class="badge badge-green">Activo</span></td><td><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">Editar</button> ${u.id !== state.currentUser.id ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Borrar</button>` : ''}</td></tr>`).join(''); 
+    tb.innerHTML=state.users.map(u=>{
+        const isMe = u.id === state.currentUser?.id;
+        // Jerarquía: Gerentes no pueden borrar/editar al admin
+        const canEdit = state.currentUser.role === 'admin' || (state.currentUser.role === 'gerente' && u.role !== 'admin');
+        const actionBtns = canEdit ? `<button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">Editar</button> ${!isMe && u.role!=='admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Borrar</button>` : ''}` : '<span style="color:var(--text-muted);font-size:11px;">Sin Permiso</span>';
+        
+        return `<tr><td style="font-weight:600">${u.name} ${isMe?'(Tú)':''}</td><td><span class="badge ${u.role==='admin'?'badge-amber':(u.role==='gerente'?'badge-blue':'badge-green')}">${u.role.toUpperCase()}</span></td><td class="mono">${u.goal ? formatMoney(u.goal) : '--'}</td><td><span class="badge badge-green">Activo</span></td><td>${actionBtns}</td></tr>`;
+    }).join(''); 
 }
+
 function openUserModal(id=null) { 
     state.editingUserId=id; document.getElementById('user-modal').style.display=''; 
-    if(id){ const u=state.users.find(x=>x.id===id); document.getElementById('user-name').value=u.name; document.getElementById('user-pin').value=u.pin; document.getElementById('user-role').value=u.role; }
-    else { document.getElementById('user-name').value=''; document.getElementById('user-pin').value=''; document.getElementById('user-role').value='cajero'; }
+    if(id){ 
+        const u=state.users.find(x=>x.id===id); 
+        document.getElementById('user-name').value=u.name; document.getElementById('user-pin').value=u.pin; document.getElementById('user-role').value=u.role; document.getElementById('user-goal').value=u.goal||'';
+        // Proteger Admin Maestro
+        if(u.role === 'admin' && state.currentUser.role !== 'admin') { closeModal('user-modal'); return toast('Acceso Denegado', 'error'); }
+        document.getElementById('user-role').disabled = (u.role === 'admin'); // No se puede quitar el rol admin así nomás
+    }
+    else { document.getElementById('user-name').value=''; document.getElementById('user-pin').value=''; document.getElementById('user-role').value='cajero'; document.getElementById('user-goal').value=''; document.getElementById('user-role').disabled = false; }
 }
+
 async function saveUserApp() {
     const name = document.getElementById('user-name').value.trim(); const pin = document.getElementById('user-pin').value.trim();
     if(!name || pin.length !== 4) { toast('Nombre y PIN 4 dígitos', 'error'); return; }
-    const u = {id:state.editingUserId||('U'+Date.now()), name, pin, role:document.getElementById('user-role').value, active:'true'};
+    const u = {id:state.editingUserId||('U'+Date.now()), name, pin, role:document.getElementById('user-role').value, goal:document.getElementById('user-goal').value, active:'true'};
     if(state.editingUserId){ state.users[state.users.findIndex(x=>x.id===u.id)]=u; apiCall({action:'updateRow',tab:'Usuarios',idField:'id',idValue:u.id,updates:u}); }
     else { state.users.push(u); apiCall({action:'write',tab:'Usuarios',rows:[u]}); }
     closeModal('user-modal'); renderUsers(); toast('Usuario guardado');
 }
+
 async function deleteUser(id) {
-    if(!confirm('¿Seguro que quieres borrar este usuario?')) return;
+    if(!confirm('¿Eliminar usuario?')) return;
     state.users = state.users.filter(u => u.id !== id);
     renderUsers(); apiCall({action:'deleteRow',tab:'Usuarios',idField:'id',idValue:id}); toast('Usuario borrado');
 }
 
-// ── 5. POS Y CHECKOUT ──
+// ── 6. MIS METAS (SOLO CAJERO) ──
+function renderMyStats() {
+  if(state.currentUser.role !== 'cajero') return;
+  const goal = parseFloat(state.currentUser.goal) || 0;
+  const todayDate = new Date().toISOString().split('T')[0]; const thisMonth = todayDate.substring(0,7);
+  
+  const mySales = state.sales.filter(s => s.sellerName === state.currentUser.name);
+  const totalToday = mySales.filter(s => s.date?.startsWith(todayDate)).reduce((sum, s) => sum + parseFloat(s.total), 0);
+  const totalMonth = mySales.filter(s => s.date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.total), 0);
+  
+  document.getElementById('my-sales-today').textContent = formatMoney(totalToday);
+  document.getElementById('my-sales-month').textContent = formatMoney(totalMonth);
+  document.getElementById('my-goal-target').textContent = goal > 0 ? formatMoney(goal) : 'Meta no definida';
+  
+  if(goal > 0) {
+      let pct = (totalMonth / goal) * 100;
+      document.getElementById('my-goal-percent').textContent = `${pct.toFixed(1)}% alcanzado`;
+      document.getElementById('my-goal-bar').style.width = `${Math.min(pct, 100)}%`;
+      if(pct >= 100) document.getElementById('my-goal-bar').style.background = 'var(--green)';
+  }
+}
+
+// ── 7. POS Y CHECKOUT ──
 function renderPOSProducts() { 
   const cats = [...new Set(state.products.map(p => p.category).filter(Boolean))];
   const catsDiv = document.getElementById('pos-cats');
@@ -765,13 +821,13 @@ async function checkout(method, r=0) {
   const sale = { id:'S'+Date.now(), date:new Date().toISOString(), total:t.toFixed(2), subtotal:sub.toFixed(2), discount:d, paymentMethod:method, amountReceived:method==='Efectivo'?r:t, change:method==='Efectivo'?(r-t).toFixed(2):0, customerId:cid, customerName:cnm, sellerName:state.currentUser.name, items:state.cart.length };
   
   state.sales.unshift(sale); const cartClone = state.cart.slice(); clearCart(); 
-  document.getElementById('receipt-body').innerHTML=`<div style="font-size:36px;color:var(--accent);font-family:monospace;font-weight:bold;">${formatMoney(t)}</div><div style="margin-top:12px;color:var(--text-muted)">Atendió: ${state.currentUser.name}</div>${method==='Efectivo'?`<div style="color:var(--green); font-size:12px; margin-top:8px;">Cambio: ${formatMoney(r-t)}</div>`:''}`; 
+  document.getElementById('receipt-body').innerHTML=`<div style="font-size:36px;color:var(--accent);font-family:monospace;font-weight:bold;">${formatMoney(t)}</div><div style="margin-top:12px;color:var(--text-muted)">Atendió: ${state.currentUser.name}</div>`; 
   state.lastReceiptData = { sale, cartItems: cartClone }; document.getElementById('receipt-modal').style.display='';
   
   apiCall({action:'write',tab:'Ventas',rows:[sale]}).then(async ()=>{
       for (const item of cartClone) { const prod = state.products.find(p => p.id === item.productId); if (prod) { prod.stock = Math.max(0, parseInt(prod.stock) - item.qty); await apiCall({ action: 'updateRow', tab: 'Productos', idField: 'id', idValue: prod.id, updates: { stock: prod.stock } }); } }
       if(cid) { const cust = state.customers.find(c=>c.id===cid); if(cust) { cust.totalPurchases=(parseInt(cust.totalPurchases)||0)+1; cust.totalAmount=(parseFloat(cust.totalAmount)||0)+t; apiCall({action:'updateRow',tab:'Clientes',idField:'id',idValue:cid,updates:{totalPurchases:cust.totalPurchases, totalAmount:cust.totalAmount}}); }}
-      renderInventory(); renderPOSProducts();
+      renderInventory(); renderPOSProducts(); renderMyStats();
   });
 }
 
@@ -781,12 +837,12 @@ function printReceipt() {
   w.document.write(`<!DOCTYPE html><html><head><title>Ticket</title><style>@page{margin:0;} body{font-family:monospace;font-size:12px;width:300px;margin:0 auto;padding:10px;} h1{text-align:center;font-size:18px;margin:0 0 10px 0;} .text-center{text-align:center;} .line{border-top:1px dashed #000;margin:5px 0;} table{width:100%;border-collapse:collapse;} th,td{text-align:left;padding:3px 0;} .right{text-align:right;} .row{display:flex;justify-content:space-between;padding:2px 0;} .bold{font-weight:bold;font-size:14px;}</style></head><body onload="window.print();window.close();"><h1>${state.config.bizName}</h1><div class="text-center">Ticket: ${sale.id}</div><div class="text-center">Atendió: ${sale.sellerName}</div><div class="text-center">${new Date(sale.date).toLocaleString('es')}</div><div class="line"></div><table><thead><tr><th>Cant</th><th>Descr.</th><th class="right">Importe</th></tr></thead><tbody>${cartItems.map(i=>`<tr><td>${i.qty}</td><td>${i.name}</td><td class="right">${formatMoney(i.price*i.qty)}</td></tr>`).join('')}</tbody></table><div class="line"></div><div class="row bold"><span>TOTAL</span><span>${formatMoney(sale.total)}</span></div><div class="row"><span>Pago (${sale.paymentMethod})</span><span>${formatMoney(sale.amountReceived)}</span></div>${sale.paymentMethod==='Efectivo'?`<div class="row"><span>Cambio</span><span>${formatMoney(sale.change)}</span></div>`:''}<div class="line"></div><div class="text-center" style="margin-top:15px">¡Gracias por su compra!</div></body></html>`); w.document.close();
 }
 
-// ── 6. REPORTES (CHART.JS) ──
+// ── 8. REPORTES (CHART.JS) ──
 function renderReports() {
   const todayDate = new Date().toISOString().split('T')[0]; const thisMonth = todayDate.substring(0,7);
   const totalToday = state.sales.filter(s => s.date?.startsWith(todayDate)).reduce((sum, s) => sum + parseFloat(s.total), 0);
   const totalMonth = state.sales.filter(s => s.date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.total), 0);
-  document.getElementById('report-stats').innerHTML = `<div class="card"><div style="font-size:13px; color:var(--text-muted)">Hoy</div><div style="font-size:24px; font-weight:800; color:var(--accent); margin-top:8px">${formatMoney(totalToday)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Este Mes</div><div style="font-size:24px; font-weight:800; color:var(--blue); margin-top:8px">${formatMoney(totalMonth)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Operaciones Totales</div><div style="font-size:24px; font-weight:800; margin-top:8px">${state.sales.length}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Ticket Promedio</div><div style="font-size:24px; font-weight:800; margin-top:8px">${formatMoney(state.sales.length>0?totalMonth/state.sales.length:0)}</div></div>`;
+  document.getElementById('report-stats').innerHTML = `<div class="card"><div style="font-size:13px; color:var(--text-muted)">Ventas de Hoy</div><div style="font-size:24px; font-weight:800; color:var(--accent); margin-top:8px">${formatMoney(totalToday)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Ventas del Mes</div><div style="font-size:24px; font-weight:800; color:var(--blue); margin-top:8px">${formatMoney(totalMonth)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Operaciones Totales</div><div style="font-size:24px; font-weight:800; margin-top:8px">${state.sales.length}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Ticket Promedio</div><div style="font-size:24px; font-weight:800; margin-top:8px">${formatMoney(state.sales.length>0?totalMonth/state.sales.length:0)}</div></div>`;
 
   const labels = []; const data = [];
   for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); labels.push(d.toLocaleDateString('es', { weekday: 'short' })); data.push(state.sales.filter(s => s.date?.startsWith(d.toISOString().split('T')[0])).reduce((sum, s) => sum + parseFloat(s.total), 0)); }
@@ -795,16 +851,7 @@ function renderReports() {
   salesChartInstance = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Ventas Diarias', data: data, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }});
 }
 
-// ── 7. CSV Y DEMAS MÓDULOS ──
-function exportData(type) {
-  const escape = (val) => `"${String(val).replace(/"/g, '""')}"`; let headers=[], rows=[], filename='';
-  if (type === 'inventory') { headers = ['ID', 'Codigo', 'Nombre', 'Categoria', 'Precio', 'Stock']; rows = state.products.map(p => [p.id, p.barcode||'', p.name, p.category||'', p.price, p.stock]); filename='Inventario'; } 
-  else if (type === 'crm') { headers = ['ID', 'Nombre', 'Telefono', 'Compras', 'Monto']; rows = state.customers.map(c => [c.id, c.name, c.phone||'', c.totalPurchases, c.totalAmount]); filename='Clientes'; } 
-  else if (type === 'history') { headers = ['Ticket', 'Fecha', 'Vendedor', 'Metodo', 'Total', 'Items']; rows = state.sales.map(s => [s.id, s.date, s.sellerName, s.paymentMethod, s.total, s.items]); filename='Ventas'; }
-  const csv = [headers.join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
-  const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })); link.download = `${filename}_VentaFlow.csv`; link.click();
-}
-
+// ── 9. INVENTARIO, CRM Y PROVEEDORES ──
 function renderInventory() { const v=document.getElementById('inv-search').value.toLowerCase(); document.getElementById('inv-tbody').innerHTML=state.products.filter(p=>p.name.toLowerCase().includes(v)||p.barcode?.includes(v)).map(p=>`<tr><td class="mono">${p.barcode||'--'}</td><td>${p.name}</td><td class="mono">${formatMoney(p.price)}</td><td>${p.stock}</td><td><button class="btn btn-ghost btn-sm" onclick="openProductModal('${p.id}')">Editar</button></td></tr>`).join(''); }
 function openProductModal(id=null){ state.editingProductId=id; document.getElementById('product-modal').style.display=''; if(id){const p=state.products.find(x=>x.id===id); document.getElementById('prod-name').value=p.name; document.getElementById('prod-barcode').value=p.barcode||''; document.getElementById('prod-category').value=p.category; document.getElementById('prod-price').value=p.price; document.getElementById('prod-stock').value=p.stock;} else {document.getElementById('prod-name').value=''; document.getElementById('prod-barcode').value=''; document.getElementById('prod-category').value=''; document.getElementById('prod-price').value=''; document.getElementById('prod-stock').value='';} }
 function saveProduct() { const p={id:state.editingProductId||('P'+Date.now()), name:document.getElementById('prod-name').value, barcode:document.getElementById('prod-barcode').value, category:document.getElementById('prod-category').value||'Gen', price:document.getElementById('prod-price').value, stock:document.getElementById('prod-stock').value, cost:0, unit:'pza'}; if(state.editingProductId){ state.products[state.products.findIndex(x=>x.id===p.id)]=p; apiCall({action:'updateRow',tab:'Productos',idField:'id',idValue:p.id,updates:p});} else {state.products.push(p); apiCall({action:'write',tab:'Productos',rows:[p]});} closeModal('product-modal'); renderInventory(); renderPOSProducts(); toast('Producto guardado');}
@@ -814,12 +861,32 @@ function populateCustomerSelect() { const s = document.getElementById('cart-cust
 function openCustomerModal(id=null){ state.editingCustomerId=id; document.getElementById('customer-modal').style.display=''; if(id){const c=state.customers.find(x=>x.id===id); document.getElementById('cust-name').value=c.name; document.getElementById('cust-phone').value=c.phone;} else {document.getElementById('cust-name').value=''; document.getElementById('cust-phone').value='';} }
 function saveCustomer() { const c={id:state.editingCustomerId||('C'+Date.now()), name:document.getElementById('cust-name').value, phone:document.getElementById('cust-phone').value, totalPurchases:0, totalAmount:0}; if(state.editingCustomerId){ const o=state.customers.find(x=>x.id===state.editingCustomerId); c.totalPurchases=o.totalPurchases; c.totalAmount=o.totalAmount; state.customers[state.customers.findIndex(x=>x.id===c.id)]=c; apiCall({action:'updateRow',tab:'Clientes',idField:'id',idValue:c.id,updates:c});} else {state.customers.push(c); apiCall({action:'write',tab:'Clientes',rows:[c]});} closeModal('customer-modal'); renderCRM(); populateCustomerSelect(); toast('Cliente guardado');}
 
-function renderHistory() { const f1=document.getElementById('hist-from').value; const f2=document.getElementById('hist-to').value; let arr=[...state.sales].sort((a,b)=>new Date(b.date)-new Date(a.date)); if(f1) arr=arr.filter(s=>s.date>=f1); if(f2) arr=arr.filter(s=>s.date<=(f2+'T23:59:59')); document.getElementById('hist-tbody').innerHTML=arr.map(s=>`<tr><td class="mono" style="font-size:12px;color:var(--text-muted)">${s.id}</td><td>${new Date(s.date).toLocaleString('es')}</td><td>${s.sellerName}</td><td><span class="badge ${s.paymentMethod==='Efectivo'?'badge-green':'badge-blue'}">${s.paymentMethod}</span></td><td class="mono" style="color:var(--text); font-weight:bold;">${formatMoney(s.total)}</td></tr>`).join(''); }
+function renderSuppliers() { document.getElementById('suppliers-tbody').innerHTML=(state.suppliers||[]).map(s=>`<tr><td style="font-weight:600">${s.company}</td><td>${s.name}</td><td class="mono">${s.phone}</td><td>${s.email}</td><td><button class="btn btn-ghost btn-sm" onclick="openSupplierModal('${s.id}')">Editar</button></td></tr>`).join(''); }
+function openSupplierModal(id=null){ state.editingSupplierId=id; document.getElementById('supplier-modal').style.display=''; if(id){const s=state.suppliers.find(x=>x.id===id); document.getElementById('sup-company').value=s.company; document.getElementById('sup-name').value=s.name; document.getElementById('sup-phone').value=s.phone; document.getElementById('sup-email').value=s.email; } else {document.getElementById('sup-company').value=''; document.getElementById('sup-name').value=''; document.getElementById('sup-phone').value=''; document.getElementById('sup-email').value='';} }
+function saveSupplier() { const s={id:state.editingSupplierId||('PROV'+Date.now()), company:document.getElementById('sup-company').value, name:document.getElementById('sup-name').value, phone:document.getElementById('sup-phone').value, email:document.getElementById('sup-email').value, notes:''}; if(state.editingSupplierId){ state.suppliers[state.suppliers.findIndex(x=>x.id===s.id)]=s; apiCall({action:'updateRow',tab:'Proveedores',idField:'id',idValue:s.id,updates:s});} else { if(!state.suppliers)state.suppliers=[]; state.suppliers.push(s); apiCall({action:'write',tab:'Proveedores',rows:[s]});} closeModal('supplier-modal'); renderSuppliers(); toast('Proveedor guardado');}
+
+function renderHistory() { 
+    const f1=document.getElementById('hist-from').value; const f2=document.getElementById('hist-to').value; 
+    let arr=[...state.sales].sort((a,b)=>new Date(b.date)-new Date(a.date)); 
+    // Si es cajero, filtrar para ver solo los suyos
+    if(state.currentUser.role === 'cajero') arr = arr.filter(s => s.sellerName === state.currentUser.name);
+    
+    if(f1) arr=arr.filter(s=>s.date>=f1); if(f2) arr=arr.filter(s=>s.date<=(f2+'T23:59:59')); 
+    document.getElementById('hist-tbody').innerHTML=arr.map(s=>`<tr><td class="mono" style="font-size:12px;color:var(--text-muted)">${s.id}</td><td>${new Date(s.date).toLocaleString('es')}</td><td>${s.sellerName}</td><td><span class="badge ${s.paymentMethod==='Efectivo'?'badge-green':'badge-blue'}">${s.paymentMethod}</span></td><td class="mono" style="color:var(--text); font-weight:bold;">${formatMoney(s.total)}</td></tr>`).join(''); 
+}
+
+function exportData(type) {
+  const escape = (val) => `"${String(val).replace(/"/g, '""')}"`; let headers=[], rows=[], filename='';
+  if (type === 'inventory') { headers = ['ID', 'Codigo', 'Nombre', 'Categoria', 'Precio', 'Stock']; rows = state.products.map(p => [p.id, p.barcode||'', p.name, p.category||'', p.price, p.stock]); filename='Inventario'; } 
+  else if (type === 'crm') { headers = ['ID', 'Nombre', 'Telefono', 'Compras', 'Monto']; rows = state.customers.map(c => [c.id, c.name, c.phone||'', c.totalPurchases, c.totalAmount]); filename='Clientes'; } 
+  else if (type === 'history') { headers = ['Ticket', 'Fecha', 'Vendedor', 'Metodo', 'Total', 'Items']; rows = state.sales.map(s => [s.id, s.date, s.sellerName, s.paymentMethod, s.total, s.items]); filename='Ventas'; }
+  const csv = [headers.join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
+  const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })); link.download = `${filename}_VentaFlow.csv`; link.click();
+}
 
 function openSettings() { document.getElementById('settings-modal').style.display=''; document.getElementById('settings-biz').value=state.config.bizName; document.getElementById('settings-url').value=state.config.scriptUrl; }
-function saveSettings() { state.config.bizName=document.getElementById('settings-biz').value; state.config.scriptUrl=document.getElementById('settings-url').value; localStorage.setItem('vflow_db_v7', JSON.stringify(state.config)); location.reload(); }
+function saveSettings() { state.config.bizName=document.getElementById('settings-biz').value; state.config.scriptUrl=document.getElementById('settings-url').value; localStorage.setItem('vflow_db_v8', JSON.stringify(state.config)); location.reload(); }
 function resetApp() { localStorage.clear(); location.reload(); }
-function toggleKeypad() { const i = document.getElementById('barcode-input'); i.focus(); }
 function closeModal(id) { document.getElementById(id).style.display='none'; }
 function toast(m,t='info') { const e=document.createElement('div'); e.className=`toast ${t}`; e.textContent=m; document.getElementById('toast-container').appendChild(e); setTimeout(()=>e.remove(),3000); }
 </script>
