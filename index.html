@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
+  :root {
     --bg: #0b0c10;
     --surface: #13151c;
     --surface2: #1e212b;
@@ -39,34 +39,8 @@
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
-    /* Transición suave para cambios globales si es necesario */
     transition: background-color 0.3s ease; 
   }
-    <div id="lock-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:2000; flex-direction:column; align-items:center; justify-content:center;">
-  <div style="text-align:center; margin-bottom: 30px; animation: slideInUp 0.4s ease-out;">
-    <div class="logo-text" style="font-size:42px">Venta<span>Flow</span></div>
-    <div style="color:var(--text-muted); margin-top:12px; font-size: 15px;">Ingresa tu PIN para continuar</div>
-  </div>
-  
-  <div style="display:flex; gap:16px; margin-bottom:40px; animation: fadeIn 0.6s ease-out;" id="pin-display">
-    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-  </div>
-  
-  <div class="numpad" style="animation: slideInUp 0.5s ease-out;">
-    <button class="num-btn" onclick="addPin('1')">1</button>
-    <button class="num-btn" onclick="addPin('2')">2</button>
-    <button class="num-btn" onclick="addPin('3')">3</button>
-    <button class="num-btn" onclick="addPin('4')">4</button>
-    <button class="num-btn" onclick="addPin('5')">5</button>
-    <button class="num-btn" onclick="addPin('6')">6</button>
-    <button class="num-btn" onclick="addPin('7')">7</button>
-    <button class="num-btn" onclick="addPin('8')">8</button>
-    <button class="num-btn" onclick="addPin('9')">9</button>
-    <button class="num-btn" style="color:var(--red); font-size: 20px;" onclick="clearPin()">C</button>
-    <button class="num-btn" onclick="addPin('0')">0</button>
-    <button class="num-btn" style="color:var(--accent); font-size: 24px;" onclick="removePin()">⌫</button>
-  </div>
-</div>
 
   code, .mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -132,7 +106,6 @@
     font-weight: 600;
   }
   
-  /* Indicador lateral sutil para el item activo */
   .nav-btn.active::before {
       content: '';
       position: absolute;
@@ -170,22 +143,16 @@
     box-shadow: var(--shadow-sm);
   }
   .btn:active { transform: scale(0.97); }
-  
   .btn-accent { background: var(--accent); color: #000; }
   .btn-accent:hover { background: var(--accent-hover); box-shadow: 0 0 10px var(--accent-dim); }
-  
   .btn-ghost { background: var(--surface3); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
   .btn-ghost:hover { background: var(--surface2); border-color: var(--text-muted); }
-  
   .btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.3); box-shadow: none; }
   .btn-danger:hover { background: var(--red); color: #fff; box-shadow: 0 0 10px var(--red-dim);}
-  
   .btn-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
   .btn-green:hover { background: var(--green); color: #fff; box-shadow: 0 0 10px var(--green-dim);}
-  
   .btn-blue { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
   .btn-blue:hover { background: var(--blue); color: #fff; box-shadow: 0 0 10px var(--blue-dim);}
-  
   .btn-sm { padding: 6px 12px; font-size: 13px; }
   .btn-lg { padding: 14px 28px; font-size: 16px; }
   .btn-icon { padding: 8px; width: 36px; height: 36px; }
@@ -242,10 +209,8 @@
   .barcode-bar .input { font-size: 16px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; background: var(--surface2); border:none;}
   .barcode-bar .input:focus { box-shadow: none; border:none;}
   .scan-indicator { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: pulse 2s infinite; box-shadow: 0 0 8px var(--green);}
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
   .products-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 4px; align-content: start;}
-  
   .product-tile { 
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
     padding: 16px 14px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -253,21 +218,15 @@
     box-shadow: var(--shadow-sm);
     animation: slideInUp 0.3s ease-out backwards;
   }
-  
-  /* Retrasar la animación de los items progresivamente (opcional, requiere JS o nth-child) */
   .product-tile:nth-child(1) { animation-delay: 0.05s; }
   .product-tile:nth-child(2) { animation-delay: 0.1s; }
   .product-tile:nth-child(3) { animation-delay: 0.15s; }
   .product-tile:nth-child(4) { animation-delay: 0.2s; }
-  
   .product-tile:hover { 
-    border-color: var(--accent); 
-    background: var(--surface2); 
-    transform: translateY(-4px); 
-    box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+    border-color: var(--accent); background: var(--surface2); 
+    transform: translateY(-4px); box-shadow: 0 8px 15px rgba(0,0,0,0.4);
   }
   .product-tile:active { transform: translateY(0); }
-  
   .product-tile .p-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
   .product-tile .p-price { font-size: 17px; font-weight: 800; color: var(--accent); font-family: 'JetBrains Mono', monospace; margin-top: auto;}
   .product-tile .p-stock { font-size: 11px; color: var(--text-muted); font-weight: 500;}
@@ -278,13 +237,11 @@
   .cart-header h3 { font-size: 16px; font-weight: 700; display:flex; align-items:center; gap:8px;}
   .cart-items { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
   .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-dim); gap: 12px; font-size: 14px; text-align: center; }
-  
   .cart-item { 
     display: flex; align-items: center; gap: 10px; 
     padding: 12px; border-radius: var(--radius-sm); 
     background: var(--surface2); border: 1px solid transparent;
-    transition: all 0.2s; 
-    animation: slideInUp 0.2s ease-out;
+    transition: all 0.2s; animation: slideInUp 0.2s ease-out;
   }
   .cart-item:hover { border-color: var(--border); }
   .cart-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;}
@@ -295,7 +252,6 @@
   .qty-btn:hover { background: var(--surface3); }
   .qty-num { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
   .cart-item-total { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 800; min-width: 70px; text-align: right; color: var(--accent);}
-
   .cart-footer { border-top: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 16px; background: var(--surface2);}
   .cart-totals { display: flex; flex-direction: column; gap: 8px; }
   .cart-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); align-items: center;}
@@ -306,25 +262,15 @@
 
   /* ── MODALS ─────────────────────────────────────── */
   .modal-overlay { 
-    position: fixed; inset: 0; 
-    background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); 
-    display: flex; align-items: center; justify-content: center; 
-    z-index: 100; animation: fadeIn 0.2s ease-out; 
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); 
+    display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.2s ease-out; 
   }
-  
   .modal { 
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
-    width: 100%; max-width: 520px; max-height: 90vh; 
-    display: flex; flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: modalSlideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    width: 100%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: modalSlideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   }
-  
-  @keyframes modalSlideUp { 
-    from { opacity: 0; transform: translateY(30px) scale(0.95); } 
-    to { opacity: 1; transform: translateY(0) scale(1); } 
-  }
-  
+  @keyframes modalSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); border-radius: var(--radius) var(--radius) 0 0;}
   .modal-title { font-size: 18px; font-weight: 700; letter-spacing: 0.5px;}
   .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;}
@@ -334,10 +280,8 @@
   #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
   .toast { 
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); 
-    padding: 14px 18px; font-size: 14px; font-weight: 500; min-width: 280px; 
-    box-shadow: var(--shadow-md);
-    animation: slideLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    display: flex; align-items: center; gap: 12px; 
+    padding: 14px 18px; font-size: 14px; font-weight: 500; min-width: 280px; box-shadow: var(--shadow-md);
+    animation: slideLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 12px; 
   }
   @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
   .toast.success { border-left: 4px solid var(--green); }
@@ -351,8 +295,7 @@
   .chips { display: flex; gap: 8px; flex-wrap: wrap; }
   .chip { 
     padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 500; 
-    border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted); 
-    cursor: pointer; transition: all 0.2s; 
+    border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted); cursor: pointer; transition: all 0.2s; 
   }
   .chip:hover { border-color: var(--accent); color: var(--text); background: var(--surface3);}
   .chip.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600;}
@@ -367,31 +310,17 @@
   .customer-card { 
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
     padding: 20px; cursor: pointer; transition: all 0.2s; 
-    display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; 
-    box-shadow: var(--shadow-sm);
+    display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; box-shadow: var(--shadow-sm);
   }
   .customer-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: var(--shadow-md);}
   .customer-name { font-size: 16px; font-weight: 700; margin-bottom: 4px;}
   .customer-meta { font-size: 13px; color: var(--text-muted); display:flex; gap: 10px;}
   
   .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 16px; color: var(--text-dim); text-align: center; }
-  
   .page { display: none; }
   .page.active { display: block; }
 
-  /* ── RESPONSIVE ──────────────────────────────────── */
-  @media (max-width: 900px) {
-    .sidebar { width: 70px; }
-    .sidebar .logo-text, .sidebar .logo-sub, .nav-btn span, .nav-section { display: none; }
-    .nav-btn { justify-content: center; padding: 14px; }
-    .nav-btn::before { display: none; } /* Ocultar indicador en mobile */
-    .pos-layout { grid-template-columns: 1fr; height: auto; display: flex; flex-direction: column; }
-    .pos-left { flex: 1; }
-    .pos-right { height: 60vh; flex-shrink: 0; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .form-grid { grid-template-columns: 1fr; }
-  }
-    /* ── NUMPAD & LOGIN ──────────────────────────────── */
+  /* ── NUMPAD & LOGIN ──────────────────────────────── */
   .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); transition: all 0.2s; background: transparent; }
   .pin-dot.filled { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px var(--accent-dim); transform: scale(1.1); }
   
@@ -407,13 +336,62 @@
   .num-btn:hover { background: var(--surface3); border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md);}
   .num-btn:active { transform: scale(0.92); background: var(--surface); box-shadow: none;}
 
-  /* Clase de utilidad para esconder elementos a los cajeros */
+  /* ── SETUP PAGE ─────────────────────────────────── */
+  .setup-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 40px; background: var(--bg); }
+  .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 640px; box-shadow: var(--shadow-md);}
+  .setup-steps { display: flex; gap: 0; margin-bottom: 28px; }
+  .setup-step { flex: 1; padding: 16px; border-bottom: 2px solid var(--border); cursor: pointer; transition: all 0.15s; text-align: center; }
+  .setup-step.active { border-color: var(--accent); }
+  .setup-step-num { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .setup-step-label { font-size: 13px; font-weight: 600; }
+  .setup-step.active .setup-step-label { color: var(--accent); }
+  .code-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a8b5ff; overflow-x: auto; white-space: pre; line-height: 1.6; }
+
   .hide-for-cajero { display: none !important; }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 900px) {
+    .sidebar { width: 70px; }
+    .sidebar .logo-text, .sidebar .logo-sub, .nav-btn span, .nav-section { display: none; }
+    .nav-btn { justify-content: center; padding: 14px; }
+    .nav-btn::before { display: none; } 
+    .pos-layout { grid-template-columns: 1fr; height: auto; display: flex; flex-direction: column; }
+    .pos-left { flex: 1; }
+    .pos-right { height: 60vh; flex-shrink: 0; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
 <div id="toast-container"></div>
+
+<div id="lock-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:2000; flex-direction:column; align-items:center; justify-content:center;">
+  <div style="text-align:center; margin-bottom: 30px; animation: slideInUp 0.4s ease-out;">
+    <div class="logo-text" style="font-size:42px">Venta<span>Flow</span></div>
+    <div style="color:var(--text-muted); margin-top:12px; font-size: 15px;">Ingresa tu PIN para continuar</div>
+  </div>
+  
+  <div style="display:flex; gap:16px; margin-bottom:40px; animation: fadeIn 0.6s ease-out;" id="pin-display">
+    <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+  </div>
+  
+  <div class="numpad" style="animation: slideInUp 0.5s ease-out;">
+    <button class="num-btn" onclick="addPin('1')">1</button>
+    <button class="num-btn" onclick="addPin('2')">2</button>
+    <button class="num-btn" onclick="addPin('3')">3</button>
+    <button class="num-btn" onclick="addPin('4')">4</button>
+    <button class="num-btn" onclick="addPin('5')">5</button>
+    <button class="num-btn" onclick="addPin('6')">6</button>
+    <button class="num-btn" onclick="addPin('7')">7</button>
+    <button class="num-btn" onclick="addPin('8')">8</button>
+    <button class="num-btn" onclick="addPin('9')">9</button>
+    <button class="num-btn" style="color:var(--red); font-size: 20px;" onclick="clearPin()">C</button>
+    <button class="num-btn" onclick="addPin('0')">0</button>
+    <button class="num-btn" style="color:var(--accent); font-size: 24px;" onclick="removePin()">⌫</button>
+  </div>
+</div>
 
 <div id="setup-page" style="display:none">
   <div class="setup-page">
@@ -450,12 +428,13 @@
             <span class="badge badge-blue">Ventas</span>
             <span class="badge badge-green">VentaItems</span>
             <span class="badge badge-amber">Clientes</span>
+            <span class="badge badge-red">Usuarios</span>
           </div>
         </div>
         <button class="btn btn-accent" onclick="showSetupStep(2)">Siguiente →</button>
       </div>
 
-<div id="setup-step-2" style="padding:0 24px 24px;display:none">
+      <div id="setup-step-2" style="padding:0 24px 24px;display:none">
         <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">2. Crea el Apps Script</h3>
         <p style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:16px">
           En tu Google Sheet, ve a <strong style="color:var(--text)">Extensiones → Apps Script</strong>. 
@@ -478,10 +457,8 @@ function handleRequest(e) {
     const action = params.action || body.action;
     const sheet = SHEET_NAME;
 
-    // Inicializar pestañas si no existen
     ensureSheets(sheet);
 
-    // ── LEER DATOS ──────────────────────────────────────────
     if (action === 'read') {
       const tab = params.tab || body.tab;
       const s = sheet.getSheetByName(tab);
@@ -496,7 +473,6 @@ function handleRequest(e) {
       return ok({ rows });
     }
 
-    // ── ESCRIBIR DATOS ──────────────────────────────────────
     if (action === 'write') {
       const tab = body.tab;
       const rows = body.rows;
@@ -511,7 +487,6 @@ function handleRequest(e) {
       return ok({ written: rows.length });
     }
 
-    // ── ACTUALIZAR FILA ─────────────────────────────────────
     if (action === 'updateRow') {
       const tab = body.tab;
       const idField = body.idField;
@@ -534,7 +509,6 @@ function handleRequest(e) {
       return ok({ updated: true });
     }
 
-    // ── BORRAR FILA ─────────────────────────────────────────
     if (action === 'deleteRow') {
       const tab = body.tab;
       const idField = body.idField;
@@ -559,7 +533,6 @@ function handleRequest(e) {
   }
 }
 
-// ── ESTRUCTURA DE LA BASE DE DATOS ────────────────────────
 function ensureSheets(ss) {
   const tabs = {
     'Productos': ['id','barcode','name','category','price','cost','stock','unit'],
@@ -591,12 +564,12 @@ function ok(data) {
         </p>
         <button class="btn btn-accent" style="margin-top:16px" onclick="showSetupStep(3)">Siguiente →</button>
       </div>
+
       <div id="setup-step-3" style="padding:0 24px 24px;display:none">
         <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">3. Conecta tu base de datos</h3>
         <div class="input-group" style="margin-bottom:16px">
           <label class="input-label">URL de tu Apps Script</label>
           <input type="url" id="script-url-input" class="input" placeholder="https://script.google.com/macros/s/...">
-          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Pega aquí la URL que obtuviste al implementar el script</div>
         </div>
         <div class="input-group" style="margin-bottom:16px">
           <label class="input-label">Nombre del negocio</label>
@@ -604,8 +577,7 @@ function ok(data) {
         </div>
         <div style="display:flex;gap:10px">
           <button class="btn btn-ghost" onclick="testConnection()" id="test-btn">
-            <span class="spinner" id="test-spinner" style="display:none"></span>
-            Probar conexión
+            <span class="spinner" id="test-spinner" style="display:none"></span> Probar conexión
           </button>
           <button class="btn btn-accent" onclick="saveConfig()" id="save-config-btn">
             ✓ Guardar y comenzar
