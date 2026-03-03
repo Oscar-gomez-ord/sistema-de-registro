@@ -24,6 +24,7 @@
     --green: #10b981;
     --red: #ef4444;
     --warning: #f59e0b;
+    --gold: #fbbf24;
     
     --text: #f8fafc;         
     --text-muted: #94a3b8;   
@@ -32,6 +33,7 @@
     --radius: 12px;
     --radius-sm: 8px;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 15px rgba(251, 191, 36, 0.2); /* Brillo dorado para admin */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,6 +42,7 @@
 
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
 
   /* ── PANTALLAS DE INICIO & AUTENTICACIÓN ── */
   .auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;}
@@ -54,13 +57,21 @@
 
   .code-block { background: #0b0f19; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a8b5ff; overflow-y: auto; height: 250px; white-space: pre; margin-bottom: 16px;}
 
-  /* ── SELECCIÓN DE USUARIO ── */
+  /* ── SELECCIÓN DE USUARIO (JERARQUÍA VISUAL) ── */
   .user-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; width: 100%; max-width: 800px; margin-top: 40px; }
-  .user-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 16px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+  .user-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 24px 16px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); position: relative; }
   .user-card:hover { border-color: var(--accent); background: var(--surface2); transform: translateY(-5px); }
+  
+  /* Estilo Especial Admin */
+  .user-card.admin { border-color: rgba(251, 191, 36, 0.4); background: linear-gradient(180deg, var(--surface), rgba(251, 191, 36, 0.05)); }
+  .user-card.admin:hover { border-color: var(--gold); box-shadow: var(--shadow-glow); transform: translateY(-5px); }
+  .admin-crown { position: absolute; top: -12px; font-size: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
   .user-card-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+  .user-card.admin .user-card-avatar { background: linear-gradient(135deg, var(--warning), #d97706); color: #000;}
   .user-card-name { font-size: 16px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.2; margin-bottom: 4px; }
-  .user-card-role { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .user-card-role { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .user-card.admin .user-card-role { color: var(--gold); }
 
   /* ── PIN PAD ── */
   #pin-display { display: flex; gap: 16px; margin: 20px 0 40px; justify-content: center; }
@@ -160,8 +171,9 @@
 
   /* ── MODALS ── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; animation: fadeIn 0.2s; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 500px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 500px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); animation: popIn 0.3s; }
   .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); border-radius: var(--radius) var(--radius) 0 0; }
+  .modal-title { font-size: 18px; font-weight: 700; }
   .modal-body { padding: 24px; overflow-y: auto; max-height: 70vh; }
   .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; background: var(--surface2); border-radius: 0 0 var(--radius) var(--radius); }
 
@@ -191,7 +203,7 @@
       <div class="option-card" onclick="showSetupStep('new')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
         <div class="option-title">Sistema Nuevo</div>
-        <div class="option-desc">Quiero generar el código para crear mi base de datos.</div>
+        <div class="option-desc">Generar el código para crear mi base de datos en Sheets.</div>
       </div>
       <div class="option-card" onclick="showSetupStep('existing')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -276,7 +288,7 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
     </div>
     <div style="display:flex; gap:10px; margin-top:20px;">
       <button class="btn btn-ghost" onclick="showSetupStep('choice')">Atrás</button>
-      <button class="btn btn-accent" style="flex:1;" onclick="connectSystem('new')">Verificar y Crear Usuarios Base</button>
+      <button class="btn btn-accent" style="flex:1;" onclick="connectSystem('new')">Verificar y Conectar Base</button>
     </div>
   </div>
 
@@ -304,9 +316,13 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
   <div id="pin-pad-section" style="display:none; animation: slideUp 0.3s forwards; width:100%; max-width: 320px;">
     <div style="text-align:center; margin-bottom:20px;">
       <div id="selected-user-name" style="font-size:24px; font-weight:700; color:var(--accent);">Usuario</div>
-      <div style="font-size:13px; color:var(--text-muted); cursor:pointer; text-decoration:underline; margin-top:4px;" onclick="cancelPinEntry()">← Cambiar usuario</div>
+      <div id="btn-change-user" style="font-size:13px; color:var(--text-muted); cursor:pointer; text-decoration:underline; margin-top:4px;" onclick="cancelPinEntry()">← Cambiar usuario</div>
     </div>
     
+    <div id="rescue-msg" style="display:none; color:var(--bg); background:var(--accent); padding:8px 16px; border-radius:var(--radius-sm); font-weight:700; margin-bottom: 20px; font-size:13px; text-align:center;">
+      ¡Base de datos nueva!<br>Teclea <span style="font-size:18px; font-family:monospace;">0000</span> para empezar.
+    </div>
+
     <div id="pin-display">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
@@ -336,9 +352,9 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="14 2 14 8 20 8"/><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg> <span>Historial de Ventas</span>
       </button>
 
-      <div class="nav-section role-admin">Administración</div>
+      <div class="nav-section role-admin">Administración (Admin)</div>
       <button class="nav-btn role-admin" onclick="switchPage('reports')" id="nav-reports">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span>Panel de Reportes</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span>Dashboard y Reportes</span>
       </button>
       <button class="nav-btn role-admin" onclick="switchPage('inventory')" id="nav-inventory">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> <span>Inventario</span>
@@ -347,13 +363,13 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> <span>Clientes CRM</span>
       </button>
       <button class="nav-btn role-admin" onclick="switchPage('users')" id="nav-users">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Personal & Roles</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Gestión de Personal</span>
       </button>
     </div>
     
     <div class="sidebar-footer role-admin">
       <button class="nav-btn" onclick="openSettings()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 005 19.07M4.93 4.93A10 10 0 0019 19.07"/></svg> <span>Configuración</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 005 19.07M4.93 4.93A10 10 0 0019 19.07"/></svg> <span>Ajustes de Sistema</span>
       </button>
     </div>
   </div>
@@ -409,11 +425,13 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
     </div>
 
     <div id="page-reports" class="content page">
+      <div class="top-controls">
+        <button class="btn btn-ghost" onclick="exportData('history')">📥 Exportar Historial CSV</button>
+      </div>
       <div class="stats-grid" id="report-stats"></div>
       <div class="card" style="margin-bottom: 24px;">
         <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
           <div class="card-title">Ventas (Últimos 7 días)</div>
-          <button class="btn btn-ghost btn-sm" onclick="exportData('history')">📥 Exportar Reporte CSV</button>
         </div>
         <canvas id="salesChartCanvas" height="80"></canvas>
       </div>
@@ -447,7 +465,7 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
 
     <div id="page-users" class="content page">
       <div style="margin-bottom:16px"><button class="btn btn-accent" onclick="openUserModal(null)">+ Nuevo Empleado</button></div>
-      <div class="card" style="padding:0">
+      <div class="card" style="padding:0;">
         <div class="table-wrap">
           <table><thead><tr><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="users-tbody"></tbody></table>
         </div>
@@ -466,57 +484,96 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
-<div class="modal-overlay" id="cash-modal" style="display:none"><div class="modal" style="max-width:400px"><div class="modal-header"><div class="modal-title">Cobro en Efectivo</div></div><div class="modal-body" style="padding:24px;"><div style="text-align:center; font-size:14px; color:var(--text-muted);">Total a Cobrar</div><div style="text-align:center; font-size:36px; font-weight:800; color:var(--accent); font-family:monospace; margin-bottom:20px;" id="cash-total-display">$0.00</div><div class="input-group"><input type="number" id="cash-received" class="input" style="font-size:24px; text-align:center; font-family:monospace;" placeholder="Monto Recibido" oninput="calculateChange()"></div><div style="text-align:center; font-size:14px; color:var(--text-muted); margin-top:20px;">Cambio</div><div style="text-align:center; font-size:28px; font-weight:700; color:var(--green); font-family:monospace;" id="cash-change-display">$0.00</div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('cash-modal')">Cancelar</button><button class="btn btn-green" id="btn-confirm-cash" onclick="confirmCashCheckout()">Confirmar Venta</button></div></div></div>
+<div class="modal-overlay" id="onboarding-modal" style="display:none; z-index:11000;">
+  <div class="modal" style="max-width:400px; text-align:center;">
+    <div class="modal-body" style="padding:40px 24px;">
+      <div style="font-size:48px; margin-bottom:16px;">🎉</div>
+      <h2 style="margin-bottom:12px;">¡Administrador Creado!</h2>
+      <p style="color:var(--text-muted); margin-bottom:24px;">Tu cuenta principal está lista. ¿Qué deseas hacer ahora?</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <button class="btn btn-accent btn-lg" onclick="finishOnboarding('users')">Crear cuentas para Cajeros</button>
+        <button class="btn btn-ghost btn-lg" onclick="finishOnboarding('inventory')">Ir directo al Inventario</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="product-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Producto</div><button class="btn btn-ghost btn-sm" onclick="closeModal('product-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Código</label><input type="text" id="prod-barcode" class="input mono"></div><div class="input-group"><label class="input-label">Nombre</label><input type="text" id="prod-name" class="input"></div><div class="input-group"><label class="input-label">Precio Venta</label><input type="number" id="prod-price" class="input"></div><div class="input-group"><label class="input-label">Stock</label><input type="number" id="prod-stock" class="input"></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveProduct()">Guardar Producto</button></div></div></div>
+<div class="modal-overlay" id="user-modal" style="display:none">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><div class="modal-title" id="user-modal-title">Usuario del Sistema</div><button class="btn btn-ghost btn-sm" id="close-user-modal-btn" onclick="closeModal('user-modal')">✕</button></div>
+    <div class="modal-body">
+      <div id="first-setup-msg" style="display:none; color:#000; background:var(--accent); padding:16px; border-radius:var(--radius-sm); font-weight:700; margin-bottom:16px; text-align:center;">
+        ¡Crea tu cuenta de Administrador Maestro!
+      </div>
+      <div class="input-group"><label class="input-label">Nombre Completo *</label><input type="text" id="user-name" class="input" placeholder="Ej: Carlos López"></div>
+      <div class="input-group"><label class="input-label">PIN de Seguridad (4 dígitos) *</label><input type="number" id="user-pin" class="input mono" placeholder="1234"></div>
+      <div class="input-group" id="user-role-group"><label class="input-label">Nivel de Acceso</label><select id="user-role" class="input"><option value="admin">Administrador (Ver Reportes e Inventario)</option><option value="cajero">Cajero (Solo vender)</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" id="cancel-user-modal-btn" onclick="closeModal('user-modal')">Cancelar</button><button class="btn btn-accent" onclick="saveUser()">Guardar</button></div>
+  </div>
+</div>
 
-<div class="modal-overlay" id="user-modal" style="display:none"><div class="modal" style="max-width:400px;"><div class="modal-header"><div class="modal-title">Usuario</div><button class="btn btn-ghost btn-sm" onclick="closeModal('user-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Nombre Completo</label><input type="text" id="user-name" class="input"></div><div class="input-group"><label class="input-label">PIN (4 dígitos) *</label><input type="number" id="user-pin" class="input mono" placeholder="1234"></div><div class="input-group" id="user-role-group"><label class="input-label">Nivel de Acceso</label><select id="user-role" class="input"><option value="cajero">Cajero (Solo Caja)</option><option value="admin">Administrador (Total)</option></select></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('user-modal')">Cancelar</button><button class="btn btn-accent" onclick="saveUser()">Guardar</button></div></div></div>
+<div class="modal-overlay" id="cash-modal" style="display:none"><div class="modal" style="max-width:400px"><div class="modal-header"><div class="modal-title">Pago en Efectivo</div></div><div class="modal-body" style="padding:24px;"><div style="text-align:center; font-size:14px; color:var(--text-muted);">Total a Cobrar</div><div style="text-align:center; font-size:36px; font-weight:800; color:var(--accent); font-family:monospace; margin-bottom:20px;" id="cash-total-display">$0.00</div><div class="input-group"><input type="number" id="cash-received" class="input" style="font-size:24px; text-align:center; font-family:monospace;" placeholder="Monto Recibido" oninput="calculateChange()"></div><div style="text-align:center; font-size:14px; color:var(--text-muted); margin-top:20px;">Cambio a Devolver</div><div style="text-align:center; font-size:28px; font-weight:700; color:var(--green); font-family:monospace;" id="cash-change-display">$0.00</div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('cash-modal')">Cancelar</button><button class="btn btn-green" id="btn-confirm-cash" onclick="confirmCashCheckout()">Confirmar Venta</button></div></div></div>
+
+<div class="modal-overlay" id="product-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Producto</div><button class="btn btn-ghost btn-sm" onclick="closeModal('product-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Código de Barras</label><input type="text" id="prod-barcode" class="input mono"></div><div class="input-group"><label class="input-label">Nombre</label><input type="text" id="prod-name" class="input"></div><div class="input-group"><label class="input-label">Categoría</label><input type="text" id="prod-category" class="input" placeholder="Ej: General"></div><div class="input-group"><label class="input-label">Precio</label><input type="number" id="prod-price" class="input"></div><div class="input-group"><label class="input-label">Stock</label><input type="number" id="prod-stock" class="input"></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancelar</button><button class="btn btn-accent" onclick="saveProduct()">Guardar Producto</button></div></div></div>
 
 <div class="modal-overlay" id="customer-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Cliente</div><button class="btn btn-ghost btn-sm" onclick="closeModal('customer-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Nombre</label><input type="text" id="cust-name" class="input"></div><div class="input-group"><label class="input-label">Teléfono</label><input type="text" id="cust-phone" class="input"></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveCustomer()">Guardar</button></div></div></div>
 
-<div class="modal-overlay" id="settings-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Ajustes</div><button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Negocio</label><input type="text" id="settings-biz" class="input"></div><div class="input-group"><label class="input-label">URL Base de Datos</label><input type="url" id="settings-url" class="input"></div><div style="margin-top:20px"><button class="btn btn-danger" style="width:100%" onclick="resetApp()">Desvincular y Borrar Datos</button></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveSettings()">Guardar</button></div></div></div>
+<div class="modal-overlay" id="settings-modal" style="display:none"><div class="modal"><div class="modal-header"><div class="modal-title">Configuración</div><button class="btn btn-ghost btn-sm" onclick="closeModal('settings-modal')">✕</button></div><div class="modal-body"><div class="input-group"><label class="input-label">Negocio</label><input type="text" id="settings-biz" class="input"></div><div class="input-group"><label class="input-label">URL Base de Datos</label><input type="url" id="settings-url" class="input"></div><div style="margin-top:20px"><button class="btn btn-danger" style="width:100%" onclick="resetApp()">Desvincular y Borrar Datos Locales</button></div></div><div class="modal-footer"><button class="btn btn-accent" onclick="saveSettings()">Guardar Cambios</button></div></div></div>
 
 <div class="modal-overlay" id="receipt-modal" style="display:none"><div class="modal" style="max-width:350px"><div class="modal-header"><div class="modal-title" style="color:var(--green)">✓ Venta Exitosa</div></div><div class="modal-body" id="receipt-body" style="text-align:center; padding:24px;"></div><div class="modal-footer" style="flex-direction:column; gap:10px;"><button class="btn btn-ghost" style="width:100%" onclick="printReceipt()">🖨️ Imprimir Ticket</button><button class="btn btn-accent" style="width:100%" onclick="closeModal('receipt-modal')">Siguiente Venta</button></div></div></div>
 
 <div class="modal-overlay" id="scanner-modal" style="display:none" onclick="if(event.target===this)closeScanner()"><div class="modal" style="max-width:420px"><div class="modal-header"><div class="modal-title">Escanear Código</div><button class="btn btn-ghost btn-sm" onclick="closeScanner()">✕</button></div><div class="modal-body" style="text-align:center;"><video id="scanner-video" style="width:100%; border-radius:8px; background:#000;" autoplay playsinline muted></video><div id="scanner-result" style="font-size:13px;color:var(--accent);font-family:monospace;margin-top:12px;">Cargando cámara...</div></div></div></div>
 
 <script>
-let state = { config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN' }, currentUser: null, userLoginSelected: null, users: [], products: [], customers: [], sales: [], cart: [], currentCat: '', editingUserId: null, editingProductId: null, editingCustomerId: null, lastReceiptData: null, scannerStream: null, scannerInterval: null };
+let state = { config: { scriptUrl: '', bizName: 'Mi Tienda', currency: 'MXN' }, currentUser: null, userLoginSelected: null, isFirstSetup: false, users: [], products: [], customers: [], sales: [], cart: [], currentCat: '', editingUserId: null, editingProductId: null, editingCustomerId: null, lastReceiptData: null, scannerStream: null, scannerInterval: null };
 const formatMoney = (a) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: state.config.currency }).format(a);
 let salesChartInstance = null;
 
+// ── 1. INICIO Y ENRUTAMIENTO ──
 window.addEventListener('load', async () => {
-  const cfg = localStorage.getItem('vflow_db'); if(cfg) state.config = JSON.parse(cfg);
+  const cfg = localStorage.getItem('vflow_config_v5'); 
+  if(cfg) { try { state.config = JSON.parse(cfg); } catch(e){} }
   
   if(!state.config.scriptUrl) {
     document.getElementById('setup-screen').style.display = 'flex';
+    document.getElementById('setup-choice').style.display = 'block';
   } else {
+    // Modo carga
     document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('user-selection-grid').innerHTML = '<div style="color:var(--accent); text-align:center; width:100%;">Descargando usuarios...</div>';
+    document.getElementById('user-selection-grid').style.display = 'none';
+    document.getElementById('pin-pad-section').style.display = 'none';
+    document.getElementById('login-subtitle').textContent = "Sincronizando con base de datos...";
     
     await syncAllData();
     
+    // DECISIÓN VITAL: ¿Hay usuarios o está vacía?
     if(!state.users || state.users.length === 0) {
-        // Redundancia por si borraron todo en Google Sheets
-        alert("La base de datos está limpia. Se restaurará la configuración.");
-        localStorage.clear(); location.reload();
+      document.getElementById('login-subtitle').textContent = "Sistema Nuevo Detectado";
+      document.getElementById('pin-pad-section').style.display = 'block';
+      document.getElementById('selected-user-name').textContent = "Inicialización";
+      document.getElementById('btn-change-user').style.display = 'none'; // No puede cambiar
+      document.getElementById('rescue-msg').style.display = 'block';
     } else {
-        renderUserSelection();
+      renderUserSelection();
     }
   }
 
   document.getElementById('barcode-input').addEventListener('keydown', e => { if (e.key === 'Enter') { addByBarcode(e.target.value.trim()); e.target.value = ''; }});
   document.getElementById('discount-input').addEventListener('input', updateCartUI);
-  document.addEventListener('keydown', handleKeypadLogin);
   
-  const t = new Date(); document.getElementById('hist-to').value = t.toISOString().split('T')[0];
-  t.setDate(t.getDate()-7); document.getElementById('hist-from').value = t.toISOString().split('T')[0];
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('pin-pad-section').style.display === 'block' && !isAuthenticating) {
+      if (e.key >= '0' && e.key <= '9') addPin(e.key); else if (e.key === 'Backspace') removePin();
+    }
+  });
 });
 
-// SETUP Y CREACION DE USUARIOS POR DEFECTO
+// ── 2. SETUP (CONFIGURACIÓN DE DB) ──
 function showSetupStep(step) {
     document.getElementById('setup-choice').style.display = 'none';
     document.getElementById('setup-new').style.display = 'none';
@@ -528,40 +585,18 @@ function showSetupStep(step) {
 
 function copyScript() { navigator.clipboard.writeText(document.getElementById('apps-script-code').textContent); toast('Código copiado', 'success'); }
 
-async function apiCall(params) { try { return await (await fetch(state.config.scriptUrl, { method: 'POST', body: JSON.stringify(params) })).json(); } catch (e) { return null; } }
-
 async function connectSystem(type) {
     const url = type === 'new' ? document.getElementById('script-url-new').value.trim() : document.getElementById('script-url-exist').value.trim();
     if(!url) { toast('Ingresa la URL', 'error'); return; }
     
     state.config.scriptUrl = url;
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('user-selection-grid').innerHTML = '<div style="color:var(--accent); text-align:center; width:100%;">Conectando y validando base de datos...</div>';
-    
-    await syncAllData();
-
-    if(type === 'new' || state.users.length === 0) {
-        // Crear 5 usuarios base automáticamente
-        const defaultUsers = [
-            { id: 'U1', name: 'Admin Maestro', pin: '1111', role: 'admin', active: 'true' },
-            { id: 'U2', name: 'Gerente', pin: '2222', role: 'admin', active: 'true' },
-            { id: 'U3', name: 'Caja Principal', pin: '3333', role: 'cajero', active: 'true' },
-            { id: 'U4', name: 'Caja Dos', pin: '4444', role: 'cajero', active: 'true' },
-            { id: 'U5', name: 'Vendedor', pin: '5555', role: 'cajero', active: 'true' }
-        ];
-        
-        for(let u of defaultUsers) { await apiCall({action: 'write', tab: 'Usuarios', rows: [u]}); }
-        state.users = defaultUsers;
-        toast('Se crearon 5 usuarios por defecto.', 'success');
-    }
-    
-    localStorage.setItem('vflow_db', JSON.stringify(state.config));
-    renderUserSelection();
+    localStorage.setItem('vflow_config_v5', JSON.stringify(state.config));
+    location.reload(); // Recarga para entrar al ciclo normal
 }
 
+async function apiCall(params) { try { return await (await fetch(state.config.scriptUrl, { method: 'POST', body: JSON.stringify(params) })).json(); } catch (e) { return null; } }
+
 async function syncAllData() {
-  const btn = document.getElementById('btn-sync'); if(btn) btn.textContent = "Sincronizando...";
   const [p, u, c, s] = await Promise.all([
     apiCall({ action: 'read', tab: 'Productos' }), apiCall({ action: 'read', tab: 'Usuarios' }), 
     apiCall({ action: 'read', tab: 'Clientes' }), apiCall({ action: 'read', tab: 'Ventas' })
@@ -569,28 +604,35 @@ async function syncAllData() {
   if(p?.ok) state.products = p.rows; if(u?.ok) state.users = u.rows; 
   if(c?.ok) state.customers = c.rows; if(s?.ok) state.sales = s.rows;
   if(state.currentUser) { renderPOSProducts(); renderInventory(); renderCRM(); populateCustomerSelect(); if(state.currentUser.role === 'admin') renderReports(); }
-  if(btn) btn.textContent = "↻ Sincronizar DB";
 }
 
-// ── SISTEMA DE LOGIN Y SELECCION DE USUARIO ──
+// ── 3. LOGIN Y SELECCIÓN DE USUARIOS ──
 let currentPin = ''; let isAuthenticating = false;
 
 function renderUserSelection() {
     const grid = document.getElementById('user-selection-grid');
-    grid.style.display = 'grid'; document.getElementById('pin-pad-section').style.display = 'none'; document.getElementById('login-subtitle').textContent = "¿Quién eres? Selecciona tu perfil";
-    grid.innerHTML = state.users.filter(u=>u.active!=='false').map(u => `
-        <div class="user-card" onclick="selectUserForLogin('${u.id}')">
+    grid.style.display = 'grid'; 
+    document.getElementById('pin-pad-section').style.display = 'none'; 
+    document.getElementById('rescue-msg').style.display = 'none';
+    document.getElementById('login-subtitle').textContent = "¿Quién eres? Selecciona tu perfil";
+    
+    grid.innerHTML = state.users.filter(u=>u.active!=='false').map(u => {
+        const isAdmin = u.role === 'admin';
+        return `
+        <div class="user-card ${isAdmin ? 'admin' : ''}" onclick="selectUserForLogin('${u.id}')">
+            ${isAdmin ? '<div class="admin-crown">👑</div>' : ''}
             <div class="user-card-avatar">${u.name.charAt(0).toUpperCase()}</div>
             <div class="user-card-name">${u.name}</div>
-            <div class="user-card-role">${u.role}</div>
+            <div class="user-card-role">${isAdmin ? 'Administrador' : 'Cajero'}</div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function selectUserForLogin(id) {
     state.userLoginSelected = state.users.find(u => u.id === id);
     document.getElementById('user-selection-grid').style.display = 'none';
     document.getElementById('pin-pad-section').style.display = 'block';
+    document.getElementById('btn-change-user').style.display = 'block';
     document.getElementById('login-subtitle').textContent = "Ingresa tu PIN";
     document.getElementById('selected-user-name').textContent = state.userLoginSelected.name;
     clearPin();
@@ -598,17 +640,11 @@ function selectUserForLogin(id) {
 
 function cancelPinEntry() { state.userLoginSelected = null; clearPin(); renderUserSelection(); }
 
-function handleKeypadLogin(e) {
-    if (document.getElementById('pin-pad-section').style.display === 'block' && !isAuthenticating) {
-      if (e.key >= '0' && e.key <= '9') addPin(e.key); else if (e.key === 'Backspace') removePin();
-    }
-}
-
 function addPin(num) {
   if (isAuthenticating) return;
   if (currentPin.length < 4) {
     currentPin += num; updatePinDisplay();
-    if (currentPin.length === 4) { isAuthenticating = true; setTimeout(attemptLogin, 300); }
+    if (currentPin.length === 4) { isAuthenticating = true; setTimeout(attemptLogin, 250); }
   }
 }
 function clearPin() { currentPin = ''; updatePinDisplay(); }
@@ -616,43 +652,112 @@ function removePin() { currentPin = currentPin.slice(0, -1); updatePinDisplay();
 function updatePinDisplay() { document.querySelectorAll('.pin-dot').forEach((dot, i) => { dot.classList.toggle('filled', i < currentPin.length); }); }
 
 function attemptLogin() {
-  if (state.userLoginSelected.pin === currentPin) {
+  // Caso Especial: Base de datos nueva. Pide 0000.
+  if (state.users.length === 0 && currentPin === '0000') {
+    state.isFirstSetup = true;
+    openUserModal(null, true);
+    isAuthenticating = false; return;
+  }
+  
+  if (!state.userLoginSelected) { isAuthenticating = false; return; }
+
+  if (String(state.userLoginSelected.pin) === currentPin) {
     state.currentUser = state.userLoginSelected;
-    document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'flex';
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('main-app').style.display = 'flex';
     document.getElementById('topbar-name').textContent = state.currentUser.name;
-    document.getElementById('topbar-role').textContent = state.currentUser.role.toUpperCase();
+    document.getElementById('topbar-role').textContent = state.currentUser.role === 'admin' ? 'Administrador' : 'Cajero';
     document.getElementById('topbar-avatar').textContent = state.currentUser.name.charAt(0).toUpperCase();
     
-    // Asignar roles visualmente
+    // Ocultar/Mostrar UI según Rol
     const isAdmin = state.currentUser.role === 'admin';
     document.querySelectorAll('.role-admin').forEach(el => el.style.display = isAdmin ? '' : 'none');
-    document.querySelectorAll('.role-cajero').forEach(el => el.style.display = isAdmin ? 'none' : ''); // Admin oculta menú de ventas
-    document.getElementById('nav-inventory').style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('nav-reports').style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('nav-users').style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('nav-crm').style.display = isAdmin ? 'flex' : 'none';
+    document.querySelectorAll('.role-cajero').forEach(el => el.style.display = isAdmin ? 'none' : '');
+    document.querySelector('.sidebar-footer').style.display = isAdmin ? 'block' : 'none';
 
-    // Ruteo Inteligente
+    populateCustomerSelect(); renderPOSProducts();
     if(isAdmin) switchPage('reports'); else switchPage('pos');
     
-    populateCustomerSelect(); renderPOSProducts(); toast(`¡Hola, ${state.currentUser.name}!`, 'success');
+    toast(`¡Hola, ${state.currentUser.name}!`, 'success');
   } else { 
     toast('PIN Incorrecto', 'error'); clearPin(); 
   }
   isAuthenticating = false;
 }
 
-function logout() { state.currentUser = null; state.userLoginSelected = null; document.getElementById('main-app').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex'; renderUserSelection(); }
-function switchPage(page) { if (!state.currentUser) return; document.querySelectorAll('.page, .nav-btn').forEach(el => el.classList.remove('active')); document.getElementById(`page-${page}`).classList.add('active'); const btn = document.getElementById(`nav-${page}`); if(btn) btn.classList.add('active'); const t = { pos: 'Punto de Venta', inventory: 'Inventario', crm: 'Clientes', reports: 'Dashboard', 'sales-hist': 'Historial', users: 'Personal' }; document.getElementById('page-title').textContent = t[page]; if(page==='users')renderUsers(); if(page==='inventory')renderInventory(); if(page==='sales-hist')renderHistory(); if(page==='reports')renderReports(); if(page==='crm')renderCRM();}
+function logout() { state.currentUser = null; state.userLoginSelected = null; currentPin = ''; updatePinDisplay(); document.getElementById('main-app').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex'; renderUserSelection(); }
 
-// ── POS Y VENTAS ──
-function renderPOSProducts() { document.getElementById('pos-products').innerHTML=state.products.map(p=>`<div class="product-tile" onclick="addToCart('${p.id}')"><div class="p-name">${p.name}</div><div class="p-price">${formatMoney(p.price)}</div></div>`).join(''); }
+function switchPage(page) { 
+  if (!state.currentUser) return; 
+  document.querySelectorAll('.page, .nav-btn').forEach(el => el.classList.remove('active')); 
+  document.getElementById(`page-${page}`).classList.add('active'); 
+  const btn = document.getElementById(`nav-${page}`); if(btn) btn.classList.add('active');
+  const t = { pos: 'Punto de Venta', inventory: 'Inventario', crm: 'Clientes CRM', reports: 'Dashboard', 'sales-hist': 'Historial de Ventas', users: 'Gestión de Personal' }; 
+  document.getElementById('page-title').textContent = t[page]; 
+  if(page==='users')renderUsers(); if(page==='inventory')renderInventory(); if(page==='sales-hist')renderHistory(); if(page==='reports')renderReports(); if(page==='crm')renderCRM();
+}
+
+// ── 4. GESTIÓN DE USUARIOS Y ONBOARDING ──
+function renderUsers() { 
+    const tb = document.getElementById('users-tbody');
+    if(!state.users.length) { tb.innerHTML='<tr><td colspan="4" class="empty-state">No hay usuarios</td></tr>'; return; }
+    tb.innerHTML=state.users.map(u=>`<tr><td style="font-weight:600">${u.name} ${u.id===state.currentUser?.id?'(Tú)':''}</td><td><span class="badge ${u.role==='admin'?'badge-blue':'badge-amber'}">${u.role.toUpperCase()}</span></td><td><span class="badge badge-green">Activo</span></td><td><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">Editar / Ver PIN</button></td></tr>`).join(''); 
+}
+function openUserModal(id=null, isFirst=false) { 
+    state.editingUserId=id; document.getElementById('user-modal').style.display=''; 
+    const msg = document.getElementById('first-setup-msg'); const roleGrp = document.getElementById('user-role-group'); const closeBtn = document.getElementById('close-user-modal-btn'); const cancelBtn = document.getElementById('cancel-user-modal-btn');
+    
+    if(isFirst){ msg.style.display='block'; document.getElementById('user-role').value='admin'; roleGrp.style.display='none'; closeBtn.style.display='none'; cancelBtn.style.display='none'; document.getElementById('user-name').value=''; document.getElementById('user-pin').value='';}
+    else if(id){ const u=state.users.find(x=>x.id===id); document.getElementById('user-name').value=u.name; document.getElementById('user-pin').value=u.pin; document.getElementById('user-role').value=u.role; msg.style.display='none'; roleGrp.style.display='flex'; closeBtn.style.display=''; cancelBtn.style.display='';}
+    else { document.getElementById('user-name').value=''; document.getElementById('user-pin').value=''; document.getElementById('user-role').value='cajero'; msg.style.display='none'; roleGrp.style.display='flex'; closeBtn.style.display=''; cancelBtn.style.display='';}
+}
+async function saveUser() {
+    const name = document.getElementById('user-name').value.trim(); const pin = document.getElementById('user-pin').value.trim();
+    if(!name || pin.length !== 4) { toast('Nombre y PIN 4 dígitos requeridos', 'error'); return; }
+    
+    const u = {id:state.editingUserId||('U'+Date.now()), name, pin, role:document.getElementById('user-role').value, active:'true'};
+    if(state.editingUserId){ state.users[state.users.findIndex(x=>x.id===u.id)]=u; apiCall({action:'updateRow',tab:'Usuarios',idField:'id',idValue:u.id,updates:u}); }
+    else { state.users.push(u); apiCall({action:'write',tab:'Usuarios',rows:[u]}); }
+    
+    closeModal('user-modal'); renderUsers();
+    
+    if(state.isFirstSetup) {
+      // Magia del onboarding: ¡Loguear automáticamente al nuevo admin!
+      state.isFirstSetup = false;
+      state.currentUser = u;
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('main-app').style.display = 'flex';
+      document.getElementById('topbar-name').textContent = u.name;
+      document.getElementById('topbar-role').textContent = 'ADMINISTRADOR';
+      document.getElementById('topbar-avatar').textContent = u.name.charAt(0).toUpperCase();
+      applyRoles('admin');
+      
+      // Mostrar la elección post-setup
+      document.getElementById('onboarding-modal').style.display = '';
+    } else {
+      toast('Usuario guardado', 'success');
+    }
+}
+function finishOnboarding(page) { closeModal('onboarding-modal'); switchPage(page); }
+
+// ── 5. POS Y CHECKOUT ──
+function renderPOSProducts() { 
+  const cats = [...new Set(state.products.map(p => p.category).filter(Boolean))];
+  const catsDiv = document.getElementById('pos-cats');
+  if(catsDiv) { catsDiv.innerHTML = '<div class="chip active" onclick="filterCat(\'\')" data-cat="">Todos</div>' + cats.map(c => `<div class="chip" onclick="filterCat('${c}')" data-cat="${c}">${c}</div>`).join(''); }
+  filterCat(state.currentCat);
+}
+function filterCat(cat) {
+  state.currentCat = cat; document.querySelectorAll('#pos-cats .chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+  const prods = cat ? state.products.filter(p => p.category === cat) : state.products;
+  document.getElementById('pos-products').innerHTML=prods.map(p=>`<div class="product-tile" onclick="addToCart('${p.id}')"><div class="p-name">${p.name}</div><div class="p-price">${formatMoney(p.price)}</div></div>`).join('');
+}
 function addByBarcode(c) { const p=state.products.find(x=>String(x.barcode)===c); if(p)addToCart(p.id); else toast('No encontrado', 'error');}
 function addToCart(id) { const p = state.products.find(x=>x.id===id); if(p){ const ex=state.cart.find(i=>i.productId===id); if(ex)ex.qty++; else state.cart.push({productId:id,name:p.name,price:p.price,qty:1}); updateCartUI(); } }
 function updateQty(id,d) { const i=state.cart.find(x=>x.productId===id); if(i){ i.qty+=d; if(i.qty<=0)state.cart=state.cart.filter(x=>x.productId!==id); updateCartUI(); } }
 function clearCart() { state.cart=[]; document.getElementById('discount-input').value=0; updateCartUI(); }
 function updateCartUI() { 
-    const c=document.getElementById('cart-items'); if(state.cart.length===0) { c.innerHTML='<div class="empty-state">Agrega productos al carrito</div>'; document.getElementById('cart-total').textContent='$0.00'; return; }
+    const c=document.getElementById('cart-items'); if(state.cart.length===0) { c.innerHTML='<div class="empty-state">El carrito está vacío</div>'; document.getElementById('cart-total').textContent='$0.00'; return; }
     c.innerHTML=state.cart.map(i=>`<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${i.name}</div><div class="cart-item-price">${formatMoney(i.price)}</div></div><div class="qty-control"><button class="qty-btn" onclick="updateQty('${i.productId}',-1)">-</button><span class="qty-num">${i.qty}</span><button class="qty-btn" onclick="updateQty('${i.productId}',1)">+</button></div><div class="cart-item-total">${formatMoney(i.price*i.qty)}</div></div>`).join(''); 
     const sub=state.cart.reduce((s,i)=>s+i.price*i.qty,0); const d=document.getElementById('discount-input').value||0; document.getElementById('cart-total').textContent=formatMoney(sub*(1-d/100)); 
 }
@@ -664,66 +769,60 @@ async function checkout(method, r=0) {
   if (!state.cart.length || !state.currentUser) return;
   const sub = state.cart.reduce((s,i)=>s+i.price*i.qty,0); const d = document.getElementById('discount-input').value||0; const t = sub*(1-d/100);
   const cid = document.getElementById('cart-customer').value; const cnm = cid ? state.customers.find(c=>c.id===cid)?.name : 'General';
-  const sale = { id:'S'+Date.now(), date:new Date().toISOString(), total:t, subtotal:sub, discount:d, paymentMethod:method, amountReceived:method==='Efectivo'?r:t, change:method==='Efectivo'?(r-t):0, customerId:cid, customerName:cnm, sellerName:state.currentUser.name, items:state.cart.length };
+  const sale = { id:'S'+Date.now(), date:new Date().toISOString(), total:t.toFixed(2), subtotal:sub.toFixed(2), discount:d, paymentMethod:method, amountReceived:method==='Efectivo'?r:t, change:method==='Efectivo'?(r-t).toFixed(2):0, customerId:cid, customerName:cnm, sellerName:state.currentUser.name, items:state.cart.length };
   
-  state.sales.unshift(sale); clearCart(); 
-  document.getElementById('receipt-body').innerHTML=`<div style="font-size:36px;color:var(--accent);font-family:monospace;font-weight:bold;">${formatMoney(t)}</div><div style="margin-top:12px;color:var(--text-muted)">Le atendió: ${state.currentUser.name}</div>`; document.getElementById('receipt-modal').style.display='';
+  state.sales.unshift(sale); const cartClone = state.cart.slice(); clearCart(); 
+  document.getElementById('receipt-body').innerHTML=`<div style="font-size:36px;color:var(--accent);font-family:monospace;font-weight:bold;">${formatMoney(t)}</div><div style="margin-top:12px;color:var(--text-muted)">Atendió: ${state.currentUser.name}</div>${method==='Efectivo'?`<div style="color:var(--green); font-size:12px; margin-top:8px;">Cambio: ${formatMoney(r-t)}</div>`:''}`; 
+  state.lastReceiptData = { sale, cartItems: cartClone }; document.getElementById('receipt-modal').style.display='';
   
-  apiCall({action:'write',tab:'Ventas',rows:[sale]});
-  if(cid) { const cust = state.customers.find(c=>c.id===cid); if(cust) { cust.totalPurchases=(parseInt(cust.totalPurchases)||0)+1; cust.totalAmount=(parseFloat(cust.totalAmount)||0)+t; apiCall({action:'updateRow',tab:'Clientes',idField:'id',idValue:cid,updates:{totalPurchases:cust.totalPurchases, totalAmount:cust.totalAmount}}); }}
+  apiCall({action:'write',tab:'Ventas',rows:[sale]}).then(async ()=>{
+      for (const item of cartClone) { const prod = state.products.find(p => p.id === item.productId); if (prod) { prod.stock = Math.max(0, parseInt(prod.stock) - item.qty); await apiCall({ action: 'updateRow', tab: 'Productos', idField: 'id', idValue: prod.id, updates: { stock: prod.stock } }); } }
+      if(cid) { const cust = state.customers.find(c=>c.id===cid); if(cust) { cust.totalPurchases=(parseInt(cust.totalPurchases)||0)+1; cust.totalAmount=(parseFloat(cust.totalAmount)||0)+t; apiCall({action:'updateRow',tab:'Clientes',idField:'id',idValue:cid,updates:{totalPurchases:cust.totalPurchases, totalAmount:cust.totalAmount}}); }}
+      renderInventory(); renderPOSProducts();
+  });
 }
 
-// ── REPORTES (CHART.JS) ──
+function printReceipt() {
+  if (!state.lastReceiptData) return;
+  const { sale, cartItems } = state.lastReceiptData; const w = window.open('', '_blank', 'width=350,height=600');
+  w.document.write(`<!DOCTYPE html><html><head><title>Ticket</title><style>@page{margin:0;} body{font-family:monospace;font-size:12px;width:300px;margin:0 auto;padding:10px;} h1{text-align:center;font-size:18px;margin:0 0 10px 0;} .text-center{text-align:center;} .line{border-top:1px dashed #000;margin:5px 0;} table{width:100%;border-collapse:collapse;} th,td{text-align:left;padding:3px 0;} .right{text-align:right;} .row{display:flex;justify-content:space-between;padding:2px 0;} .bold{font-weight:bold;font-size:14px;}</style></head><body onload="window.print();window.close();"><h1>${state.config.bizName}</h1><div class="text-center">Ticket: ${sale.id}</div><div class="text-center">Atendió: ${sale.sellerName}</div><div class="text-center">${new Date(sale.date).toLocaleString('es')}</div><div class="line"></div><table><thead><tr><th>Cant</th><th>Descr.</th><th class="right">Importe</th></tr></thead><tbody>${cartItems.map(i=>`<tr><td>${i.qty}</td><td>${i.name}</td><td class="right">${formatMoney(i.price*i.qty)}</td></tr>`).join('')}</tbody></table><div class="line"></div><div class="row bold"><span>TOTAL</span><span>${formatMoney(sale.total)}</span></div><div class="row"><span>Pago (${sale.paymentMethod})</span><span>${formatMoney(sale.amountReceived)}</span></div>${sale.paymentMethod==='Efectivo'?`<div class="row"><span>Cambio</span><span>${formatMoney(sale.change)}</span></div>`:''}<div class="line"></div><div class="text-center" style="margin-top:15px">¡Gracias por su compra!</div></body></html>`); w.document.close();
+}
+
+// ── 6. CHART.JS, CSV, INVENTARIO Y CRM ──
 function renderReports() {
   const todayDate = new Date().toISOString().split('T')[0]; const thisMonth = todayDate.substring(0,7);
   const totalToday = state.sales.filter(s => s.date?.startsWith(todayDate)).reduce((sum, s) => sum + parseFloat(s.total), 0);
   const totalMonth = state.sales.filter(s => s.date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.total), 0);
-  
-  document.getElementById('report-stats').innerHTML = `<div class="card"><div style="font-size:13px; color:var(--text-muted)">Hoy</div><div style="font-size:24px; font-weight:800; color:var(--accent); margin-top:8px">${formatMoney(totalToday)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Este Mes</div><div style="font-size:24px; font-weight:800; color:var(--blue); margin-top:8px">${formatMoney(totalMonth)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Operaciones</div><div style="font-size:24px; font-weight:800; margin-top:8px">${state.sales.length}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Ticket Promedio</div><div style="font-size:24px; font-weight:800; margin-top:8px">${formatMoney(state.sales.length>0?totalMonth/state.sales.length:0)}</div></div>`;
+  document.getElementById('report-stats').innerHTML = `<div class="card"><div style="font-size:13px; color:var(--text-muted)">Hoy</div><div style="font-size:24px; font-weight:800; color:var(--accent); margin-top:8px">${formatMoney(totalToday)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Este Mes</div><div style="font-size:24px; font-weight:800; color:var(--blue); margin-top:8px">${formatMoney(totalMonth)}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Operaciones Totales</div><div style="font-size:24px; font-weight:800; margin-top:8px">${state.sales.length}</div></div><div class="card"><div style="font-size:13px; color:var(--text-muted)">Ticket Promedio</div><div style="font-size:24px; font-weight:800; margin-top:8px">${formatMoney(state.sales.length>0?totalMonth/state.sales.length:0)}</div></div>`;
 
   const labels = []; const data = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i); const dateStr = d.toISOString().split('T')[0];
-    labels.push(d.toLocaleDateString('es', { weekday: 'short' }));
-    data.push(state.sales.filter(s => s.date?.startsWith(dateStr)).reduce((sum, s) => sum + parseFloat(s.total), 0));
-  }
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); labels.push(d.toLocaleDateString('es', { weekday: 'short' })); data.push(state.sales.filter(s => s.date?.startsWith(d.toISOString().split('T')[0])).reduce((sum, s) => sum + parseFloat(s.total), 0)); }
   const ctx = document.getElementById('salesChartCanvas').getContext('2d');
   if(salesChartInstance) salesChartInstance.destroy();
-  salesChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Ventas Diarias', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.2)', fill: true, tension: 0.4 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }});
+  salesChartInstance = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Ventas', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.2)', fill: true, tension: 0.4 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }});
 }
 
-// ── CRUD VARIOS ──
-function renderUsers() { document.getElementById('users-tbody').innerHTML=state.users.map(u=>`<tr><td style="font-weight:600">${u.name}</td><td><span class="badge ${u.role==='admin'?'badge-blue':'badge-amber'}">${u.role}</span></td><td><span class="badge badge-green">Activo</span></td><td><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">Editar</button></td></tr>`).join(''); }
-function openUserModal(id=null) { state.editingUserId=id; document.getElementById('user-modal').style.display=''; if(id){ const u=state.users.find(x=>x.id===id); document.getElementById('user-name').value=u.name; document.getElementById('user-pin').value=u.pin; document.getElementById('user-role').value=u.role; } else { document.getElementById('user-name').value=''; document.getElementById('user-pin').value=''; document.getElementById('user-role').value='cajero'; } }
-async function saveUser() { const u = {id:state.editingUserId||('U'+Date.now()), name:document.getElementById('user-name').value, pin:document.getElementById('user-pin').value, role:document.getElementById('user-role').value, active:'true'}; if(state.editingUserId){ state.users[state.users.findIndex(x=>x.id===u.id)]=u; apiCall({action:'updateRow',tab:'Usuarios',idField:'id',idValue:u.id,updates:u}); } else { state.users.push(u); apiCall({action:'write',tab:'Usuarios',rows:[u]}); } closeModal('user-modal'); renderUsers(); toast('Usuario guardado'); }
+function exportData(type) {
+  const escape = (val) => `"${String(val).replace(/"/g, '""')}"`; let headers=[], rows=[], filename='';
+  if (type === 'inventory') { headers = ['ID', 'Codigo', 'Nombre', 'Categoria', 'Precio', 'Stock']; rows = state.products.map(p => [p.id, p.barcode||'', p.name, p.category||'', p.price, p.stock]); filename='Inventario'; } 
+  else if (type === 'crm') { headers = ['ID', 'Nombre', 'Telefono', 'Compras', 'Monto']; rows = state.customers.map(c => [c.id, c.name, c.phone||'', c.totalPurchases, c.totalAmount]); filename='Clientes'; } 
+  else if (type === 'history') { headers = ['Ticket', 'Fecha', 'Vendedor', 'Metodo', 'Total', 'Items']; rows = state.sales.map(s => [s.id, s.date, s.sellerName, s.paymentMethod, s.total, s.items]); filename='Ventas'; }
+  const csv = [headers.join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
+  const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })); link.download = `${filename}_VentaFlow.csv`; link.click();
+}
 
 function renderInventory() { const v=document.getElementById('inv-search').value.toLowerCase(); document.getElementById('inv-tbody').innerHTML=state.products.filter(p=>p.name.toLowerCase().includes(v)||p.barcode?.includes(v)).map(p=>`<tr><td class="mono">${p.barcode||'--'}</td><td>${p.name}</td><td class="mono">${formatMoney(p.price)}</td><td>${p.stock}</td><td><button class="btn btn-ghost btn-sm" onclick="openProductModal('${p.id}')">Editar</button></td></tr>`).join(''); }
-function openProductModal(id=null){ state.editingProductId=id; document.getElementById('product-modal').style.display=''; if(id){const p=state.products.find(x=>x.id===id); document.getElementById('prod-name').value=p.name; document.getElementById('prod-barcode').value=p.barcode||''; document.getElementById('prod-price').value=p.price; document.getElementById('prod-stock').value=p.stock;} else {document.getElementById('prod-name').value=''; document.getElementById('prod-barcode').value=''; document.getElementById('prod-price').value=''; document.getElementById('prod-stock').value='';} }
-function saveProduct() { const p={id:state.editingProductId||('P'+Date.now()), name:document.getElementById('prod-name').value, barcode:document.getElementById('prod-barcode').value, price:document.getElementById('prod-price').value, stock:document.getElementById('prod-stock').value, category:'Gen', unit:'pza'}; if(state.editingProductId){ state.products[state.products.findIndex(x=>x.id===p.id)]=p; apiCall({action:'updateRow',tab:'Productos',idField:'id',idValue:p.id,updates:p});} else {state.products.push(p); apiCall({action:'write',tab:'Productos',rows:[p]});} closeModal('product-modal'); renderInventory(); renderPOSProducts(); toast('Producto guardado');}
-
+function openProductModal(id=null){ state.editingProductId=id; document.getElementById('product-modal').style.display=''; if(id){const p=state.products.find(x=>x.id===id); document.getElementById('prod-name').value=p.name; document.getElementById('prod-barcode').value=p.barcode||''; document.getElementById('prod-category').value=p.category; document.getElementById('prod-price').value=p.price; document.getElementById('prod-stock').value=p.stock;} else {document.getElementById('prod-name').value=''; document.getElementById('prod-barcode').value=''; document.getElementById('prod-category').value=''; document.getElementById('prod-price').value=''; document.getElementById('prod-stock').value='';} }
+function saveProduct() { const p={id:state.editingProductId||('P'+Date.now()), name:document.getElementById('prod-name').value, barcode:document.getElementById('prod-barcode').value, category:document.getElementById('prod-category').value||'Gen', price:document.getElementById('prod-price').value, stock:document.getElementById('prod-stock').value, cost:0, unit:'pza'}; if(state.editingProductId){ state.products[state.products.findIndex(x=>x.id===p.id)]=p; apiCall({action:'updateRow',tab:'Productos',idField:'id',idValue:p.id,updates:p});} else {state.products.push(p); apiCall({action:'write',tab:'Productos',rows:[p]});} closeModal('product-modal'); renderInventory(); renderPOSProducts(); toast('Producto guardado');}
 function renderCRM() { const v=document.getElementById('crm-search').value.toLowerCase(); document.getElementById('crm-tbody').innerHTML=state.customers.filter(c=>c.name.toLowerCase().includes(v)||c.phone?.includes(v)).map(c=>`<tr><td>${c.name}</td><td class="mono">${c.phone||'--'}</td><td>${c.totalPurchases||0}</td><td class="mono" style="color:var(--accent)">${formatMoney(c.totalAmount||0)}</td><td><button class="btn btn-ghost btn-sm" onclick="openCustomerModal('${c.id}')">Editar</button></td></tr>`).join(''); }
 function populateCustomerSelect() { const s = document.getElementById('cart-customer'); if(s) s.innerHTML='<option value="">Público General</option>'+state.customers.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''); }
 function openCustomerModal(id=null){ state.editingCustomerId=id; document.getElementById('customer-modal').style.display=''; if(id){const c=state.customers.find(x=>x.id===id); document.getElementById('cust-name').value=c.name; document.getElementById('cust-phone').value=c.phone;} else {document.getElementById('cust-name').value=''; document.getElementById('cust-phone').value='';} }
 function saveCustomer() { const c={id:state.editingCustomerId||('C'+Date.now()), name:document.getElementById('cust-name').value, phone:document.getElementById('cust-phone').value, totalPurchases:0, totalAmount:0}; if(state.editingCustomerId){ const o=state.customers.find(x=>x.id===state.editingCustomerId); c.totalPurchases=o.totalPurchases; c.totalAmount=o.totalAmount; state.customers[state.customers.findIndex(x=>x.id===c.id)]=c; apiCall({action:'updateRow',tab:'Clientes',idField:'id',idValue:c.id,updates:c});} else {state.customers.push(c); apiCall({action:'write',tab:'Clientes',rows:[c]});} closeModal('customer-modal'); renderCRM(); populateCustomerSelect(); toast('Cliente guardado');}
-
 function renderHistory() { const f1=document.getElementById('hist-from').value; const f2=document.getElementById('hist-to').value; let arr=[...state.sales].sort((a,b)=>new Date(b.date)-new Date(a.date)); if(f1) arr=arr.filter(s=>s.date>=f1); if(f2) arr=arr.filter(s=>s.date<=(f2+'T23:59:59')); document.getElementById('hist-tbody').innerHTML=arr.map(s=>`<tr><td class="mono" style="font-size:12px;color:var(--text-muted)">${s.id}</td><td>${new Date(s.date).toLocaleString('es')}</td><td>${s.sellerName}</td><td><span class="badge ${s.paymentMethod==='Efectivo'?'badge-green':'badge-blue'}">${s.paymentMethod}</span></td><td class="mono" style="color:var(--accent); font-weight:bold;">${formatMoney(s.total)}</td></tr>`).join(''); }
-
-// CSV Export
-function exportData(type) {
-  const escape = (val) => `"${String(val).replace(/"/g, '""')}"`; let headers=[], rows=[], filename='';
-  if (type === 'inventory') { headers = ['ID', 'Codigo', 'Nombre', 'Precio', 'Stock']; rows = state.products.map(p => [p.id, p.barcode||'', p.name, p.price, p.stock]); filename='Inventario'; } 
-  else if (type === 'crm') { headers = ['ID', 'Nombre', 'Telefono', 'Compras', 'Monto']; rows = state.customers.map(c => [c.id, c.name, c.phone||'', c.totalPurchases, c.totalAmount]); filename='Clientes'; } 
-  else if (type === 'history') { headers = ['Ticket', 'Fecha', 'Vendedor', 'Metodo', 'Total']; rows = state.sales.map(s => [s.id, s.date, s.sellerName, s.paymentMethod, s.total]); filename='Ventas'; }
-  const csv = [headers.join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${filename}_VentaFlow.csv`; link.click();
-}
-
-// Lector Cámara
 function openBarcodeScanner() { document.getElementById('scanner-modal').style.display = ''; navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(s => { state.scannerStream = s; const v = document.getElementById('scanner-video'); v.srcObject = s; if ('BarcodeDetector' in window) { const d = new BarcodeDetector({ formats: ['ean_13','ean_8','code_128','qr_code'] }); state.scannerInterval = setInterval(async () => { try { const c = await d.detect(v); if (c.length > 0) { document.getElementById('scanner-result').textContent = c[0].rawValue; closeScanner(); addByBarcode(c[0].rawValue); } } catch(e){} }, 400); } }).catch(e => { toast('Cámara no disponible', 'error'); closeScanner(); }); }
 function closeScanner() { if(state.scannerInterval) clearInterval(state.scannerInterval); if(state.scannerStream) state.scannerStream.getTracks().forEach(t=>t.stop()); document.getElementById('scanner-modal').style.display='none'; }
-
 function openSettings() { document.getElementById('settings-modal').style.display=''; document.getElementById('settings-biz').value=state.config.bizName; document.getElementById('settings-url').value=state.config.scriptUrl; }
-function saveSettings() { state.config.bizName=document.getElementById('settings-biz').value; state.config.scriptUrl=document.getElementById('settings-url').value; localStorage.setItem('vflow_db', JSON.stringify(state.config)); location.reload(); }
+function saveSettings() { state.config.bizName=document.getElementById('settings-biz').value; state.config.scriptUrl=document.getElementById('settings-url').value; localStorage.setItem('vflow_config_v5', JSON.stringify(state.config)); location.reload(); }
 function resetApp() { localStorage.clear(); location.reload(); }
 function toggleKeypad() { const i = document.getElementById('barcode-input'); i.focus(); }
 function closeModal(id) { document.getElementById(id).style.display='none'; }
