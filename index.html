@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VentaFlow — Enterprise POS</title>
+<title>VentaFlow — Enterprise POS v15</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -58,9 +58,24 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 @keyframes slideIn {from{transform:translateX(-12px);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes pulseGlow {0%,100%{box-shadow:0 0 0 0 var(--accent-glow)}50%{box-shadow:0 0 20px 4px var(--accent-glow)}}
 
-/* ── AUTH ── */
+/* ── LOADING SYNC STATE ── */
+.sync-loader{display:flex;flex-direction:column;align-items:center;gap:20px;padding:40px;}
+.sync-spinner{width:44px;height:44px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+.sync-text{font-size:14px;color:var(--text-soft);text-align:center;line-height:1.6;}
+.sync-dots::after{content:'';animation:dots 1.5s infinite;}
+@keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+.retry-banner{background:var(--red-dim);border:1px solid rgba(248,113,113,0.25);border-radius:var(--radius-sm);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;animation:fadeUp 0.3s ease;}
+.retry-banner p{font-size:13px;color:var(--red);font-weight:500;margin:0;}
+.connection-bar{display:flex;align-items:center;gap:8px;margin-bottom:20px;padding:8px 14px;background:var(--surface2);border-radius:100px;border:1px solid var(--border);}
+.conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.conn-dot.ok{background:var(--green);box-shadow:0 0 8px rgba(52,211,153,0.5);}
+.conn-dot.loading{background:var(--amber);animation:pulseGlow 1.5s infinite;}
+.conn-dot.error{background:var(--red);}
+.conn-label{font-size:12px;color:var(--text-soft);font-weight:500;}
+
 .auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--bg) 0%,var(--bg2) 50%,#07111e 100%);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:24px;}
 .auth-screen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(91,142,244,0.08) 0%,transparent 70%);pointer-events:none;}
+.auth-screen::after{content:'';position:fixed;bottom:0;left:0;right:0;height:40%;background:radial-gradient(ellipse 60% 40% at 50% 100%,rgba(129,140,248,0.05) 0%,transparent 70%);pointer-events:none;}
 .brand{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;letter-spacing:-1px;color:var(--text);}
 .brand span{color:var(--accent);}
 .brand-sub{font-size:13px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
@@ -86,8 +101,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .login-search input{background:transparent;border:none;color:var(--text);outline:none;font-family:inherit;font-size:14px;width:100%;}
 .login-search input::placeholder{color:var(--text-muted);}
 .user-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;width:100%;max-height:42vh;overflow-y:auto;padding:4px;}
-.user-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px 16px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:var(--shadow-sm);position:relative;animation:fadeUp 0.3s ease backwards;}
-.user-card:hover{border-color:var(--accent);background:var(--surface3);transform:translateY(-5px) scale(1.02);box-shadow:var(--shadow-glow);}
+.user-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px 16px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);box-shadow:var(--shadow-sm);position:relative;animation:fadeUp 0.3s ease backwards;}
+.user-card:hover{border-color:var(--accent);background:var(--surface3);transform:translateY(-6px) scale(1.03);box-shadow:var(--shadow-glow);}
+.user-card:active{transform:translateY(-2px) scale(0.99);}
 .user-card.admin{border-color:rgba(251,191,36,0.4);background:linear-gradient(170deg,var(--surface),rgba(251,191,36,0.06));padding:28px 44px;min-width:240px;}
 .user-card.admin:hover{border-color:var(--amber);transform:translateY(-6px);box-shadow:0 0 30px rgba(251,191,36,0.15);}
 .user-card.gerente{border-color:rgba(91,142,244,0.3);}
@@ -218,10 +234,10 @@ td{padding:13px 18px;font-size:13.5px;}
 
 /* ── DASHBOARD ── */
 .dash-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:20px;}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:all 0.2s;}
-.kpi-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow);}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);}
+.kpi-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:var(--shadow);}
 .kpi-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;background:var(--kpi-color,var(--accent-dim));transform:translate(25px,-25px);opacity:0.6;}
-.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-border,var(--accent));opacity:0.6;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-border,var(--accent));opacity:0.8;}
 .kpi-label{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
 .kpi-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
 .kpi-sub{font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:4px;}
@@ -488,12 +504,24 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
       <div class="brand" style="font-size:36px;">Venta<span>Flow</span></div>
       <div id="login-subtitle" style="color:var(--text-soft);font-size:14px;margin-top:6px;">¿Quién eres? Selecciona tu perfil</div>
     </div>
+    <div id="connection-bar" class="connection-bar" style="display:none;justify-content:center;">
+      <div class="conn-dot loading" id="conn-dot"></div>
+      <span class="conn-label" id="conn-label">Conectando con la base de datos…</span>
+    </div>
+    <div id="retry-banner" class="retry-banner" style="display:none;">
+      <p>⚠️ No se pudo conectar con Google Sheets. Verifica tu URL.</p>
+      <button class="btn btn-danger btn-sm" onclick="retrySync()">Reintentar</button>
+    </div>
+    <div id="login-sync-loader" class="sync-loader" style="display:none;">
+      <div class="sync-spinner"></div>
+      <div class="sync-text">Sincronizando datos<span class="sync-dots"></span></div>
+    </div>
     <div id="login-search-wrapper" class="login-search" style="display:none;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="login-search-input" placeholder="Buscar empleado..." oninput="filterLoginUsers()" autocomplete="off">
     </div>
-    <div id="admin-showcase" class="admin-showcase"></div>
-    <div id="user-selection-grid" class="user-grid"></div>
+    <div id="admin-showcase" class="admin-showcase" style="display:none;"></div>
+    <div id="user-selection-grid" class="user-grid" style="display:none;"></div>
     <button class="btn btn-ghost btn-sm" style="margin-top:28px;opacity:0.6;" onclick="resetApp()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Cambiar base de datos
@@ -538,7 +566,10 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
   <div class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-text">Venta<span>Flow</span></div>
-      <div class="logo-sub" id="biz-name-display">Mi Tienda</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+        <div class="logo-sub" id="biz-name-display" style="margin:0;">Mi Tienda</div>
+        <span style="font-size:9px;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(91,142,244,0.3);padding:1px 6px;border-radius:100px;font-weight:700;letter-spacing:0.5px;">v15</span>
+      </div>
     </div>
     <div class="nav">
       <div class="nav-section nav-role-cajero">Operación</div>
@@ -589,8 +620,12 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
     <div class="topbar">
       <div class="topbar-left"><div class="topbar-title" id="page-title">Punto de Venta</div></div>
       <div class="topbar-right">
+        <div id="sync-status-dot" style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;background:var(--surface2);border:1px solid var(--border);font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:0.3px;">
+          <div id="sync-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(52,211,153,0.5);"></div>
+          <span id="sync-status-label">En línea</span>
+        </div>
         <div class="clock mono" id="live-clock">00:00:00</div>
-        <button class="sync-btn" onclick="syncAllData()" id="btn-sync">
+        <button class="sync-btn" onclick="manualSync()" id="btn-sync">
           <svg class="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
           Sincronizar
         </button>
@@ -977,6 +1012,10 @@ function ok(data) { return ContentService.createTextOutput(JSON.stringify({ ok: 
         <p style="font-size:12px;color:var(--text-soft);margin-bottom:14px;">Desvincula la base de datos y borra la caché local.</p>
         <button class="btn btn-danger" style="width:100%;" onclick="resetApp()">Desvincular y borrar caché</button>
       </div>
+      <div style="margin-top:14px;padding:12px 14px;background:var(--surface2);border-radius:var(--radius-xs);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:var(--text-dim);">VentaFlow Enterprise POS</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">v15.0 · 2025</span>
+      </div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('settings-modal')">Cancelar</button><button class="btn btn-accent" onclick="saveSettings()">Guardar Cambios</button></div>
   </div>
@@ -1083,17 +1122,7 @@ window.addEventListener('load', async () => {
     goToSetupStep('choice');
   } else {
     document.getElementById('login-screen').style.display='flex';
-    setLoginSubtitle('Conectando a la base de datos…');
-    await syncAllData();
-    if(!state.users||state.users.length===0){
-      setLoginSubtitle('Sistema nuevo detectado');
-      document.getElementById('admin-showcase').style.display='none';
-      document.getElementById('user-selection-grid').style.display='none';
-      document.getElementById('pin-pad-section').style.display='block';
-      document.getElementById('selected-user-name').textContent='Nuevo Sistema';
-      document.getElementById('btn-change-user').style.display='none';
-      document.getElementById('rescue-msg').style.display='block';
-    } else { renderUserSelection(); }
+    await doLoginSync();
   }
 
   document.getElementById('barcode-input').addEventListener('keydown', e => {
@@ -1130,6 +1159,70 @@ window.addEventListener('load', async () => {
   document.getElementById('hist-from').value=t.toISOString().split('T')[0];
 });
 
+function setSyncStatus(status){
+  const dot=document.getElementById('sync-dot');
+  const label=document.getElementById('sync-status-label');
+  if(!dot||!label)return;
+  if(status==='syncing'){dot.style.background='var(--amber)';dot.style.boxShadow='0 0 6px rgba(251,191,36,0.5)';dot.style.animation='pulseGlow 1s infinite';label.textContent='Sincronizando…';}
+  else if(status==='ok'){dot.style.background='var(--green)';dot.style.boxShadow='0 0 6px rgba(52,211,153,0.5)';dot.style.animation='';label.textContent='En línea';}
+  else if(status==='error'){dot.style.background='var(--red)';dot.style.boxShadow='none';dot.style.animation='';label.textContent='Sin conexión';}
+}
+
+async function manualSync(){
+  setSyncStatus('syncing');
+  await syncAllData();
+  setSyncStatus(state._lastSyncOk?'ok':'error');
+  if(!state._lastSyncOk)toast('No se pudo conectar con Google Sheets','error');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOGIN SYNC
+// ═══════════════════════════════════════════════════════════════
+async function doLoginSync(){
+  // Show loading state
+  setLoginSubtitle('Conectando con la base de datos…');
+  document.getElementById('login-sync-loader').style.display='flex';
+  document.getElementById('connection-bar').style.display='flex';
+  document.getElementById('retry-banner').style.display='none';
+  document.getElementById('admin-showcase').style.display='none';
+  document.getElementById('user-selection-grid').style.display='none';
+  document.getElementById('login-search-wrapper').style.display='none';
+  document.getElementById('pin-pad-section').style.display='none';
+
+  await syncAllData();
+
+  document.getElementById('login-sync-loader').style.display='none';
+
+  // Detect sync failure: all critical tables failed
+  const syncFailed = !state._lastSyncOk;
+  if(syncFailed){
+    document.getElementById('conn-dot').className='conn-dot error';
+    document.getElementById('conn-label').textContent='Sin conexión con Google Sheets';
+    document.getElementById('retry-banner').style.display='flex';
+    setLoginSubtitle('Error de conexión');
+    return;
+  }
+
+  document.getElementById('connection-bar').style.display='none';
+
+  if(!state.users||state.users.length===0){
+    setLoginSubtitle('Sistema nuevo — crea tu cuenta admin');
+    document.getElementById('pin-pad-section').style.display='block';
+    document.getElementById('selected-user-name').textContent='Nuevo Sistema';
+    document.getElementById('btn-change-user').style.display='none';
+    document.getElementById('rescue-msg').style.display='block';
+  } else {
+    renderUserSelection();
+  }
+}
+
+async function retrySync(){
+  document.getElementById('retry-banner').style.display='none';
+  document.getElementById('conn-dot').className='conn-dot loading';
+  document.getElementById('conn-label').textContent='Reintentando conexión…';
+  await doLoginSync();
+}
+
 // ═══════════════════════════════════════════════════════════════
 // SETUP
 // ═══════════════════════════════════════════════════════════════
@@ -1156,8 +1249,13 @@ async function syncAllData(){
     apiCall({action:'read',tab:'Productos'}),apiCall({action:'read',tab:'Usuarios'}),
     apiCall({action:'read',tab:'Clientes'}),apiCall({action:'read',tab:'Ventas'}),apiCall({action:'read',tab:'Proveedores'})
   ]);
+  // Track if at least one critical table responded
+  state._lastSyncOk = !!(p?.ok || u?.ok);
   if(p?.ok)state.products=p.rows||[];
-  if(u?.ok)state.users=u.rows||[];
+  if(u?.ok)state.users=(u.rows||[]).map(usr=>({...usr,role:(String(usr.role||'').trim().toLowerCase())||'cajero'}));
+  if(c?.ok)state.customers=c.rows||[];
+  if(s?.ok)state.sales=s.rows||[];
+  if(sp?.ok)state.suppliers=sp.rows||[];
   if(c?.ok)state.customers=c.rows||[];
   if(s?.ok)state.sales=s.rows||[];
   if(sp?.ok)state.suppliers=sp.rows||[];
@@ -1180,25 +1278,34 @@ function renderUserSelection(){
   const grid=document.getElementById('user-selection-grid');
   const showcase=document.getElementById('admin-showcase');
   const searchBar=document.getElementById('login-search-wrapper');
-  grid.style.display='grid';
   document.getElementById('pin-pad-section').style.display='none';
   document.getElementById('rescue-msg').style.display='none';
   setLoginSubtitle('¿Quién eres? Selecciona tu perfil');
+
   const active=state.users.filter(u=>String(u.active)!=='false');
-  const adminIdx=active.findIndex(u=>u.role==='admin');
-  let others=[...active];
-  if(adminIdx!==-1){
-    const admin=others.splice(adminIdx,1)[0];
+  // Fix: filter ALL admins out of the grid (not just the first one)
+  const admins=active.filter(u=>u.role==='admin');
+  const others=active.filter(u=>u.role!=='admin');
+
+  if(admins.length>0){
+    const admin=admins[0]; // primary admin
     showcase.innerHTML=`<div class="user-card admin" onclick="selectUserForLogin('${admin.id}')"><div class="admin-crown">👑</div><div class="uc-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;">${admin.name.charAt(0).toUpperCase()}</div><div class="uc-name">${admin.name}</div><div class="uc-role">Admin Maestro</div></div>`;
     showcase.style.display='flex';
-  } else { showcase.style.display='none'; }
+  } else {
+    showcase.style.display='none';
+  }
+
   searchBar.style.display=others.length>5?'flex':'none';
+  grid.style.display=others.length>0?'grid':'none';
   buildGridHtml(others);
 }
 
 function buildGridHtml(list){
+  const roleLabel={gerente:'Gerente',cajero:'Cajero',admin:'Admin'};
   document.getElementById('user-selection-grid').innerHTML=list.map((u,i)=>{
-    return `<div class="user-card ${u.role==='gerente'?'gerente':''}" onclick="selectUserForLogin('${u.id}')" style="animation-delay:${i*0.04}s;"><div class="uc-avatar" style="background:${getAvatarColor(u.id)};">${u.name.charAt(0).toUpperCase()}</div><div class="uc-name">${u.name}</div><div class="uc-role">${u.role==='gerente'?'Gerente':'Cajero'}</div></div>`;
+    const label=roleLabel[u.role]||u.role||'Cajero';
+    const isGerente=u.role==='gerente';
+    return `<div class="user-card ${isGerente?'gerente':''}" onclick="selectUserForLogin('${u.id}')" style="animation-delay:${i*0.04}s;"><div class="uc-avatar" style="background:${getAvatarColor(u.id)};">${u.name.charAt(0).toUpperCase()}</div><div class="uc-name">${u.name}</div><div class="uc-role">${label}</div></div>`;
   }).join('');
 }
 
@@ -1256,6 +1363,7 @@ function launchApp(user){
   document.getElementById('biz-name-display').textContent=state.config.bizName;
   state.shiftStart=new Date();state.shiftSales=[];
   applyRoles(user.role);populateCustomerSelect();renderPOSProducts();updateShiftBar();
+  setSyncStatus('ok');
   if(user.role==='admin'||user.role==='gerente')switchPage('reports');else switchPage('pos');
   toast(`¡Bienvenido, ${user.name}!`,'success');
 }
@@ -1310,9 +1418,15 @@ async function wizardSaveAdmin(){
   const name=document.getElementById('wiz-admin-name').value.trim();
   const pinRaw=document.getElementById('wiz-admin-pin').value.trim();
   if(!name||pinRaw.length!==4||isNaN(pinRaw)){toast('Nombre y PIN de 4 dígitos requeridos','error');return;}
+  const btn=document.querySelector('#onboarding-wizard .btn-accent');
+  if(btn){btn.disabled=true;btn.textContent='Guardando…';}
   const u={id:'U'+Date.now(),name,pin:normalizePin(pinRaw),role:'admin',active:'true',goal:''};
   const res=await apiCall({action:'write',tab:'Usuarios',rows:[u]});
-  if(!res?.ok){toast('Error al conectar con Google Sheets','error');return;}
+  if(!res?.ok){
+    toast('Error al conectar con Google Sheets — revisa tu URL','error');
+    if(btn){btn.disabled=false;btn.textContent='Crear cuenta y entrar →';}
+    return;
+  }
   state.users=[u];launchApp(u);
 }
 
